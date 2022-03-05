@@ -5,7 +5,7 @@
 - login or reauth: `firebase login` or `firebase login --reauth`
 - define stripe.privatekey in `functions/.runtimeconfig.json`, it might be useful to get current config from firebase
 - - remove `demo-` from the beginning of projects.default in `.firebaserc`
-- - export config: `firebase functions:config`
+- - export config: `firebase functions:config:get`
 - - IMPORTANT: add `demo-` back before running firebase emulators!
 - local development requires you define a few other variables in `.env`: 
 - - from stripe developers api keys: `GATSBY_STRIPE_PUBLIC_KEY`, 
