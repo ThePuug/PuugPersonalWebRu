@@ -1,0 +1,24 @@
+{
+  "errors": {
+    "general": "Something went wrong.",
+    "paymentFailed": "Payment failed because"
+  },
+  "resolve": {
+    "reload": "Please reload the page and try again.",
+    "callToConfirm": "Please call us to confirm your booking.",
+    "safeToRetryPayment": "You can safely try again and will only be charged once."
+  },
+  "buttons": {
+    "pay": "Pay"
+  },
+  "labels": {
+    "emailAddress": "Email address:",
+    "cardDetails": "Card details",
+    "amount": "Amount to be charged:"
+  },
+  "helpers": {
+    "emailReceipt": "We will email you a receipt.",
+    "neverStoreDetails": "We NEVER store card information.",
+    "paymentProcessedBy": "The payment information provided will be processed by our Payments provider: <1>Stripe</1>."
+  }
+}

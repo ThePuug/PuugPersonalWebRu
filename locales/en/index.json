@@ -1,0 +1,60 @@
+{
+  "individualConsultation": "Individual session",
+  "couplesConsultation": "Couples session",
+  "childConsultation": "Child session",
+  "minutes": "minutes",
+  "buttons": {
+    "reserve": "Book now",
+    "abstract": "Abstract"
+  },
+  "profile": {
+    "name": "Rosanna Mihailova Chizhova-Sturgeon, Ph.D.",
+    "title": "Painter, Art Therapist"
+  },
+  "headings": {
+    "professionalExperience": "Professional experience",
+    "aboutServices": "About the services",
+    "onlineServicesOffered": "The online services offered are divided into three categories:",
+    "education": "Education",
+    "qualifications": "I graduated with excellence and received the following certifications:"
+  },
+  "content": {
+    "education": [
+      "Graduate of of the National Academy of Arts, where I obtained a doctorate, a master's degree in Art Therapy, a bachelor's degree in Painting, and Theory and Practice of Art Education.",
+      "I studied at the Master's degree program in Art Therapy at the University of Hertfordshire, England, which was founded 50 years ago and has one of the oldest internationally recognized Art Therapy programmes in the world.",
+      "Research is an important aspect of my work and includes publications, reports, and participation in international conferences, symposia, seminars, and trainings.",
+      "I have gone through different types of personal therapeutic experience: psychodrama, emotionally focused marriage therapy, individual therapy, etc."
+    ],
+    "professionalExperience": [
+      "After completing a supervised internship in 2015 I have been practicing in the field of Art Therapy.",
+      "In my private practice I integrate work with a systematic approach suitable for couples and families, which I studied at the Institute of Family Therapy.",
+      "I work by constantly enriching the range of approaches and methods I use combined with professional counseling, training, and coaching sessions.",
+      "I have professional experience with people with special needs from the autism spectrum, intellectual disability, cerebral palsy and epilepsy at the Caritas Internationalis \"Annunciation\" Social Rehabilitation, and Integration Centre in Sofia;",
+      "undergraduate and graduate students at the National Academy of Arts in Art Therapy, Personality Psychology and Art-Based Psychological Experiments;",
+      "clients of the center for creative practices for children and adults \"Art Center Harmony\";",
+      "students of primary, middle and high school age;",
+      "with children of 2 to 5 years of age in kindergartens, private centers for personal development, and entertainment."
+    ],
+    "aboutServices": [
+      "Therapeutic support is provided mainly through short term, world-renowned and evidence-based methods of working with grief and bereavement, trauma, conflict, addiction, phobias, eating disorders, stress, depression, and anxiety.",
+      "Some of the therapeutic methods used to improve life quality, promote personal development and life satisfaction include Positive and Client-Centered Therapy, Art Therapy, Cognitive Behavioral Therapy, and Dialectical Behavioral Therapy."
+    ],
+    "qualifications": [
+      "Cognitive Behavioral Therapy (CBT);",
+      "Dialectical Behavioral Therapy (DBT);",
+      "Music therapy;",
+      "Eye Movement Desensitisation and Reprocessing Therapy (EMDR);",
+      "Addiction Therapy;",
+      "Depression Counseling;",
+      "Anxiety Management;",
+      "Grief and Bereavement Counseling;",
+      "Positive Psychology;",
+      "Journal Therapy."
+    ],
+    "onlineServicesOffered": [
+      "Individual consultation assists the client to clearly define their goals, as well as the resources they have and would help them to achieve positive change. The session offers a good opportunity for additional motivation and specific guidelines for greater autonomy, life satisfaction, and balance. ",
+      "Single consultation for couples is based on the Systematic Family Therapy approach for assessment of the family environment. The dysfunctional family relations are highlighted and family structure, functions, and dynamics of development are optimized for the improved well-being of all parties.",
+      "Adolescent counseling offers a range of techniques that develop adolescents' personal potential and social skills."
+    ]
+  }
+}
