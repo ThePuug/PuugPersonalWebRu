@@ -42,7 +42,7 @@ const Component = (props) => {
         }
       });
 
-      if (confirmation.error) setError(`${error.paymentFailed} ${confirmation.error.message}. ${t('resolvers.safeToRetryPayment')}`);
+      if (confirmation.error) setError(`${t('errors.paymentFailed')} ${confirmation.error.message}. ${t('resolvers.safeToRetryPayment')}`);
       else {
         const confirmedBooking = {...booking,paymentReference: confirmation.paymentIntent.id}
         try {
