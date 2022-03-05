@@ -40,7 +40,7 @@ module.exports = {
         languages: [`bg`, `en`],
         defaultLanguage: `bg`,
         fallbackLanguage: `bg`,
-        siteUrl: `https://puugpersonalwebru.web.app/`,
+        siteUrl: `https://artudoma.com/`,
         generateDefaultLanguagePage: true,
         i18nextOptions: {
           interpolation: { escapeValue: false }
