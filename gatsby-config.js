@@ -36,11 +36,11 @@ module.exports = {
     {
       resolve: `gatsby-plugin-react-i18next`,
       options: {
-        localeJsonSourceName: `locale`,
-        languages: [`bg`, `en`],
-        defaultLanguage: `bg`,
-        fallbackLanguage: `bg`,
-        siteUrl: `https://artudoma.com/`,
+        languages: ['bg','en'],
+        defaultLanguage: 'bg',
+        fallbackLanguage: 'bg',
+        redirect: false,
+        siteUrl: 'https://artudoma.com/',
         generateDefaultLanguagePage: true,
         i18nextOptions: {
           interpolation: { escapeValue: false }

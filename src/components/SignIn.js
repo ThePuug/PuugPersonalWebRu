@@ -29,8 +29,6 @@ const Component = (props) => {
     }
   })
 
-  if(!!firebase.auth) firebase.auth().languageCode = i18n.language
-
   return (<>
     {!!firebase.auth && <Loads component={Dialog} loading={loading} onClose={onClose} {...rest} maxWidth="xs" css="text-align:center">
       <Container css="margin:1em auto">
