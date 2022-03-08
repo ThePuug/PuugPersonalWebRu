@@ -277,7 +277,8 @@ const _Slot = (props) => {
   }, [])
 
   // TODO: dont hardcode admin email
-  const canView = (status) => isSignedIn && (status==="mine" || (status==="booked" && getUser().email==="reed.debaets@gmail.com"))
+  // TODO: IMPORTANT checking against email address is not secure!
+  const canView = (status) => isSignedIn && (status==="mine" || (status==="booked" && getUser().email==="rosanna.chizhova@gmail.com"))
 
   return <TimeslotButtonGroup fullWidth={true} active={active} status={status} {...rest}>
     {!!duration && <Button disabled={!!disabled} onClick={_ => onSelectTimeslot(timeslot)} className={cx(css`flex-shrink:0`)}>
