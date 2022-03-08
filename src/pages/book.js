@@ -12,7 +12,7 @@ import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore'
 import NavigateNextIcon from '@mui/icons-material/NavigateNext'
 import FullscreenIcon from '@mui/icons-material/Fullscreen'
 import FullscreenExitIcon from '@mui/icons-material/FullscreenExit'
-import PreviewIcon from '@mui/icons-material/preview'
+import PreviewIcon from '@mui/icons-material/Preview'
 import { useTranslation } from "gatsby-plugin-react-i18next"
 import { isLoggedIn, getUser } from "../firebase"
 import firebase from "gatsby-plugin-firebase"
