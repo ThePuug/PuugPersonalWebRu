@@ -1,4 +1,4 @@
-# From scratch
+# Getting started
 - get the repo `git clone https://github.com/unliketea/PuugPersonalWebRu.git` 
 - inside the checkout, install packages: `npm install`
 - install required global packages: `npm install -g firebase-tools`
@@ -11,8 +11,8 @@
 - - from stripe developers api keys: `GATSBY_STRIPE_PUBLIC_KEY`, 
 - - from firebase authentication authorised domains: `GATSBY_FIREBASE_AUTH_DOMAIN`, 
 - - from firebase project settings: `GATSBY_FIREBASE_PROJECT_ID` and `GATSBY_FIREBASE_API_KEY`
-- for full emulation support including emulated firestore, first build (`gatsby build`) then use: `firebase emulators:start`
-- for faster local development, try fire running `firebase emulators:start --only functions,auth,firestore` then you can use: `gatsby develop`
+- for local development, run `firebase emulators:start --only functions,auth,firestore` then you can use: `gatsby develop`
+- test ssr first build (`gatsby build`) then use: `firebase emulators:start`
 
-# Demo site
-https://puugpersonalwebru.web.app/
+# Website URL
+https://artudoma.com/

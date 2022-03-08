@@ -1,5 +1,4 @@
 import React from 'react'
-import { cx, css } from '@emotion/css'
 import { Container, Drawer, FormControl, FormLabel, Stack, TextField, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
 import { DateTimePicker } from "@mui/lab"
 import { useTranslation } from "gatsby-plugin-react-i18next";
@@ -9,7 +8,7 @@ const Component = (props) => {
   const { event, ...rest } = props
 
   return <Drawer {...rest} anchor="top">
-    <Container maxWidth="sm" className={cx(css`margin:1em auto`)}>
+    <Container maxWidth="sm" css={{margin:`1em auto`}}>
       <Typography variant="title" component="h3">{t('headings.eventDetails')}</Typography>
       <Stack direction="column" gap={2} marginTop={2}>
         <FormControl component="fieldset" fullWidth={true}>

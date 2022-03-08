@@ -305,7 +305,7 @@ const Slot = styled(_Slot)`
   height:100%;
   .MuiButton-root {
     min-width:16px;
-    padding:0px;
+    padding:0px 10px;
   }
 `
 
