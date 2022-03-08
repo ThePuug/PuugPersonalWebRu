@@ -1,16 +1,18 @@
-import { createTheme } from "@material-ui/core"
-import { blueGrey, lightBlue, lightGreen } from "@material-ui/core/colors"
+import { createTheme } from "@mui/material/styles"
+import { blueGrey, lightBlue, lightGreen } from "@mui/material/colors"
 
 const theme = createTheme({
     palette: {
       freeSlot: { main: lightBlue[50] },
       mySlot: { main: lightGreen[500] },
       bookedSlot: { main: blueGrey[300] },
-      yellow: { main: '#f9ee78' },
-      pink: { main: '#f87bd7' },
-      teal: { main: '#69f4d3' },
-      blue: { main: '#68d0f3' },
-      orange: { main: '#faaa77' }
+      yellow: { main: '#f9ee7a' },
+      pink: { main: '#f97dd9' },
+      teal: { main: '#6cf4d5' },
+      blue: { main: '#6cd2f4' },
+      purple: { main: '#907df9' },
+      orange: { main: '#f9ab79' },
+      red: { main: '#f97d7d' }
     },
   })
   

@@ -1,5 +1,5 @@
 import React from "react"
-import { Backdrop, LinearProgress } from "@material-ui/core"
+import { Backdrop, LinearProgress } from "@mui/material"
 
 const Component = (props) => {
   const { loading, component, children, ...rest } = props

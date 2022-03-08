@@ -1,0 +1,16 @@
+{
+  "headings": {
+    "eventDetails": "Booking details:"
+  },
+  "labels": {
+    "consultationType": "Session is for:",
+    "adult": "Adult",
+    "couple": "Couple",
+    "child": "Child",
+    "selectDate": "Select a date",
+    "selectTime": "Select a time slot:",
+    "emailAddress": "Email address:",
+    "amount": "Amount to be charged:"
+  },
+  "date": "{{val, datetime}}"
+}

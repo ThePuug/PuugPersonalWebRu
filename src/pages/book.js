@@ -3,14 +3,16 @@ import { graphql } from "gatsby"
 import { DateTime, Duration } from 'luxon'
 import { Location } from '@reach/router'
 import queryString from 'query-string'
-import { styled } from "@material-ui/core/styles"
-import { Backdrop, Button, Card, Container, Drawer, FormControl, FormHelperText, FormLabel, IconButton, LinearProgress, Paper, Stack, ToggleButton, ToggleButtonGroup, Typography } from '@material-ui/core'
-import ArrowForwardIcon from '@material-ui/icons/ArrowForward'
-import ArrowBackIcon from '@material-ui/icons/ArrowBack'
-import NavigateBeforeIcon from '@material-ui/icons/NavigateBefore'
-import NavigateNextIcon from '@material-ui/icons/NavigateNext'
-import FullscreenIcon from '@material-ui/icons/Fullscreen'
-import FullscreenExitIcon from '@material-ui/icons/FullscreenExit'
+import { styled } from "@mui/material/styles"
+import { cx, css } from '@emotion/css'
+import { Backdrop, Box, Button, ButtonGroup, Card, Container, Drawer, FormControl, FormHelperText, FormLabel, IconButton, LinearProgress, Paper, Stack, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material'
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
+import ArrowBackIcon from '@mui/icons-material/ArrowBack'
+import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore'
+import NavigateNextIcon from '@mui/icons-material/NavigateNext'
+import FullscreenIcon from '@mui/icons-material/Fullscreen'
+import FullscreenExitIcon from '@mui/icons-material/FullscreenExit'
+import PreviewIcon from '@mui/icons-material/preview'
 import { useTranslation } from "gatsby-plugin-react-i18next"
 import { isLoggedIn, getUser } from "../firebase"
 import firebase from "gatsby-plugin-firebase"
@@ -19,6 +21,7 @@ import Nav from "../components/Nav"
 import Footer from "../components/Footer"
 import Pay from "../components/Pay"
 import Loads from "../components/Loads"
+import View from "../components/View"
 
 const slots = [11,15,19,21]
 
@@ -60,6 +63,7 @@ const Page = ({ search }) => {
   const [isPaying,setIsPaying] = useState(false)
   const [isSigningIn,setIsSigningIn] = useState(false)
   const [isSignedIn,setIsSignedIn] = useState(isLoggedIn())
+  const [viewing,setViewing] = useState(false)
   const [loading,setLoading] = useState(false)
   const [loadingEvents,setLoadingEvents] = useState(false)
   const [error,setError] = useState(null)
@@ -142,7 +146,7 @@ const Page = ({ search }) => {
       <Stack>
         <FormControl component="fieldset">
           <FormLabel>{t('labels.consultationType')}</FormLabel>
-          <ToggleButtonGroup exclusive value={sessionType} onChange={(_,v) => { if(!!v) setSessionType(v) }} css="display:flex; flex-flow:row nowrap">
+          <ToggleButtonGroup exclusive value={sessionType} onChange={(_,v) => { if(!!v) setSessionType(v) }} className={cx(css`display:flex; flex-flow:row nowrap`)}>
             <ToggleButton value="individual" color="primary">{t('labels.adult')}</ToggleButton>
             <ToggleButton value="couple" color="primary">{t('labels.couple')}</ToggleButton>
             <ToggleButton value="child" color="primary">{t('labels.child')}</ToggleButton>
@@ -171,8 +175,12 @@ const Page = ({ search }) => {
                   return <Week key={week}>
                     {Array.from({length:7},(_,k)=>(k)).map(day => {
                       const date = first.minus(Duration.fromObject({days:first.weekday%7})).plus(Duration.fromObject({days:(week)*7+day}))
-                      return (<Day key={day} date={date} handleSelect={handleSelectDay} selectable={date > today.current} isSignedIn={isSignedIn}
-                        events={events.filter(e => e.date.ordinal === date.ordinal)} />)
+                      return (<Day key={day} 
+                        date={date} 
+                        handleSelect={handleSelectDay} 
+                        selectable={date > today.current} isSignedIn={isSignedIn}
+                        events={events.filter(e => e.date.ordinal === date.ordinal)} 
+                        onView={s => { setViewing(events.find(e => conflicts(e,s))); }} />)
                     })}
                   </Week>
                 })}
@@ -183,32 +191,31 @@ const Page = ({ search }) => {
     </Container>
 
     <SignIn open={isSigningIn} onClose={() => setIsSigningIn(false)} onSuccess={handleBookNow} />
-    <Pay open={isPaying} intent={paymentIntent} booking={{
-      date: timeslot,
-      duration: sessionType === "couple" ? 90 : 60,
-      sessionType: sessionType,
-      userEmail: getUser().email,
-    }} onClose={() => setIsPaying(false)} onSuccess={onSuccessPay} />
 
     <Loads component={Drawer} loading={loading} open={isBooking} onClose={handleCloseBookingDialog} anchor="top">
-      <Container maxWidth="xs" css="margin:1em auto; text-align:center">
-        <div css='position:relative; button { position:absolute; left:0; top:50%; margin-top:-1.5rem; &:last-child { right:0; left:unset; }}'>
+      <Container maxWidth="xs" className={cx(css`margin:1em auto; text-align:center`)}>
+        <div className={cx(css`position:relative; button { position:absolute; left:0; top:50%; margin-top:-1.5rem; &:last-child { right:0; left:unset; }}`)}>
           <IconButton size="medium" aria-label="previous" onClick={() => handleChangeDay(-1)}><ArrowBackIcon /></IconButton>
           <Typography gutterBottom variant="h5">{t('date',{val:selectedDay.toJSDate(),formatParams:{val:{day:"numeric",month:"long",year:"numeric"}}})}</Typography>
           <IconButton size="medium" variant="outlined" aria-label="next" onClick={() => handleChangeDay(1)}><ArrowForwardIcon /></IconButton>
         </div>
-        <FormControl component="fieldset" css="margin-bottom:1rem">
+        <FormControl component="fieldset" className={cx(css`margin-bottom:1rem`)}>
           <FormLabel>{t('labels.selectTime')}</FormLabel>
-          <ToggleButtonGroup exclusive value={timeslot} onChange={(_,v) => setTimeslot(v)} orientation="vertical" color="primary">
+          <Stack direction="column" color="primary">
             {Array.from({length:4},(_,k)=>createSlots(selectedDay,slots[k])).sort((a,b)=>a.date.hour-b.date.hour)
               .map((s,i) => {
                 const evts = events.filter(event => event.date.ordinal===selectedDay.ordinal)
-                return <Slot key={i} css={{border:"1px solid grey"}} timeslot={s.date} selected={!!timeslot && conflicts(s,{date: timeslot, duration:120})}
-                  status={evts.some(e => conflicts(e,s))?evts.some(e => isSignedIn && conflicts(e,s) && getUser().email===e.userEmail)?"mine":"booked":"free"}
+                return <Slot key={i} 
+                  onSelectTimeslot={t => setTimeslot(t)}
+                  timeslot={s.date} 
+                  active={!!timeslot && conflicts(s,{date: timeslot, duration:120}) ? true : undefined}
                   disabled={evts.some(e => e.date<=today.current || conflicts(e,s))}
-                  duration={sessionType==="couple"?90:60} />
+                  status={evts.some(e => conflicts(e,s))?evts.some(e => isSignedIn && conflicts(e,s) && getUser().email===e.userEmail)?"mine":"booked":"free"}
+                  duration={sessionType==="couple"?90:60}
+                  onView={s => { setViewing(events.find(e => conflicts(e,s))); }}>
+                </Slot>
             })}
-          </ToggleButtonGroup>
+          </Stack>
         </FormControl>
         <Typography variant="h5" color="secondary">{sessionType === "individual" ? 60 : sessionType === 'couple' ? 75 : 40} лв</Typography>
         <Button variant="outlined" color="primary" disabled={!timeslot || loading} onClick={handleBookNow}>{t('buttons.bookNow')}</Button>
@@ -220,43 +227,85 @@ const Page = ({ search }) => {
       {loading && <LinearProgress />}
       <Backdrop invisible open={loading} />
     </Loads>
+
+    <Pay open={isPaying} intent={paymentIntent} booking={{
+      date: timeslot,
+      duration: sessionType === "couple" ? 90 : 60,
+      sessionType: sessionType,
+      userEmail: getUser().email,
+    }} onClose={() => setIsPaying(false)} onSuccess={onSuccessPay} />
+
+    <View open={!!viewing} event={viewing} onClose={() => setViewing(false)} />
+
     <Footer />
   </>)
 }
 
 const _Day = (props) => {
-  const { date, selectable, selected, handleSelect, events, children, isSignedIn, ...rest } = props
+  const { date, selectable, selected, handleSelect, events, children, isSignedIn, onView, ...rest } = props
   const state = useRef({ x: 0 });
   const handleMouseDown = e => state.current.x = e.screenX
   const handleClick = e => {
-      if (Math.abs(e.screenX - state.current.x) < 10 && selectable && handleSelect) handleSelect(date)
+      if (!e.defaultPrevented && Math.abs(e.screenX - state.current.x) < 10 && selectable && handleSelect) handleSelect(date)
       else e.preventDefault();
   };
   return (
-    <Card {...rest} variant="outlined" onClick={handleClick} onMouseDown={handleMouseDown} css="display:flex; flex-flow:row wrap;">
+    <Card {...rest} variant="outlined" onClick={handleClick} onMouseDown={handleMouseDown}>
       <DayLabel>{date.day}</DayLabel>
       {Array.from({length:4},(_,k)=>createSlots(date,slots[k])).sort((a,b)=>a.date.hour-b.date.hour)
-        .map((s,i) => <MonthSlot key={i} timeslot={s.date} disabled={true} selected={selected}
-          status={events.some(e => conflicts(e,s))?events.some(e => isSignedIn && conflicts(e,s) && getUser().email===e.userEmail)?"mine":"booked":"free"} />)}
+        .map((s,i) => <MonthSlot key={i}>
+          <Slot timeslot={s.date} 
+            disabled={true}
+            onSelectTimeslot={t => {}}
+            status={events.some(e => conflicts(e,s))?events.some(e => isSignedIn && conflicts(e,s) && getUser().email===e.userEmail)?"mine":"booked":"free"} 
+            onView={onView} />
+        </MonthSlot>)}
     </Card>
   )
 }
 
 const _Slot = (props) => {
+  const { timeslot, duration, status, onView, active, onSelectTimeslot, disabled, ...rest } = props
   const { t } = useTranslation('book')
-  const { timeslot, duration, status, ...rest } = props
-  return (<ToggleButton css="padding:0" value={timeslot} {...rest}>
-    {duration && t('date',{val:timeslot.toJSDate(),formatParams:{val:{ hour:'2-digit', minute:'2-digit'}}})}&nbsp;
-  </ToggleButton>)
+  const [isSignedIn,setIsSignedIn] = useState(isLoggedIn())
+
+  useEffect(() => {
+    const unregisterAuthObserver = firebase.auth().onAuthStateChanged(user => {
+      setIsSignedIn(!!user)
+    })
+    return () => unregisterAuthObserver();
+  }, [])
+
+  // TODO: dont hardcode admin email
+  const canView = (status) => isSignedIn && (status==="mine" || (status==="booked" && getUser().email==="reed.debaets@gmail.com"))
+
+  return <TimeslotButtonGroup fullWidth={true} active={active} status={status} {...rest}>
+    {!!duration && <Button disabled={!!disabled} onClick={_ => onSelectTimeslot(timeslot)} className={cx(css`flex-shrink:0`)}>
+      {t('date',{val:timeslot.toJSDate(),formatParams:{val:{ hour:'2-digit', minute:'2-digit'}}})}&nbsp;
+    </Button>}
+    {!duration && !canView(status) && <Button></Button>}
+    {canView(status) && <Button aria-label="View booking" 
+      onClick={e => { e.preventDefault(); onView({date:timeslot, duration:120}); }}>
+        <PreviewIcon />
+      </Button>}
+  </TimeslotButtonGroup>
 }
 
+const TimeslotButtonGroup = styled(ButtonGroup)`
+  background-color:${props => props.status==="mine"
+    ? props.theme.palette.orange.main
+    : props.status==="booked"
+      ? props.theme.palette.blue.main
+      : props.active
+        ? props.theme.palette.red.main
+        : props.theme.palette.teal.main};
+`
+
 const Slot = styled(_Slot)`
-  background-color:${props => props.status==="mine"?props.theme.palette.mySlot.main:props.status==="booked"?props.theme.palette.bookedSlot.main:props.theme.palette.freeSlot.main};
-  &:hover{
-    background-color:${props => props.status==="mine"?props.theme.palette.mySlot.main:props.status==="booked"?props.theme.palette.bookedSlot.main:props.theme.palette.freeSlot.main};
-  }
-  &[selected] {
-    background-color:${props => props.theme.palette.mySlot.main};
+  height:100%;
+  .MuiButton-root {
+    min-width:16px;
+    padding:0px;
   }
 `
 
@@ -266,7 +315,6 @@ const Calendar = styled(Paper)`
   height:100%;
   width:100%;
   transition-delay:1s;
-
   padding:0px;
   text-align:center;
   display:flex;
@@ -311,8 +359,8 @@ const MonthColLabel = styled(Container)`
   text-align:center;
   padding:.5em;
   box-sizing:border-box;
-  flex:0 0 13.785%;
-  margin:.25%;
+  flex:1 0 14.2857%;
+  margin:0px;
   padding:0px;
   border-right:1px solid lightgrey;
   &:last-child {
@@ -323,8 +371,10 @@ const MonthColLabel = styled(Container)`
 const Day = styled(_Day)`
   text-align:center;
   box-sizing:border-box;
-  flex:0 0 13.785%;
-  margin:.25%;
+  display:flex; 
+  flex-flow:row wrap;
+  flex:1 0;
+  width:14.2857%;
   opacity:${props => props.selectable?1:props.theme.palette.action.disabledOpacity};
 `
 
@@ -334,8 +384,9 @@ const DayLabel = styled(Container)`
   border-bottom:1px solid white;
 `
 
-const MonthSlot = styled(Slot)`
+const MonthSlot = styled(Box)`
   width:50%;
+  min-height:32px;
 `
 
 export default withLocation(Page)

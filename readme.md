@@ -12,7 +12,7 @@
 - - from firebase authentication authorised domains: `GATSBY_FIREBASE_AUTH_DOMAIN`, 
 - - from firebase project settings: `GATSBY_FIREBASE_PROJECT_ID` and `GATSBY_FIREBASE_API_KEY`
 - for full emulation support including emulated firestore, first build (`gatsby build`) then use: `firebase emulators:start`
-- for faster local development THAT USES YOUR CONFIGURED FIREBASE RESOURCES, you can use: `gatsby develop`
+- for faster local development, try fire running `firebase emulators:start --only functions,auth,firestore` then you can use: `gatsby develop`
 
 # Demo site
 https://puugpersonalwebru.web.app/

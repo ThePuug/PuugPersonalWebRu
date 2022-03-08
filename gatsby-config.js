@@ -5,7 +5,7 @@ module.exports = {
     title: "Regain Us",
   },
   plugins: [
-    "gatsby-plugin-styled-components",
+    "gatsby-plugin-emotion",
     "gatsby-plugin-image",
     "gatsby-plugin-react-helmet",
     {

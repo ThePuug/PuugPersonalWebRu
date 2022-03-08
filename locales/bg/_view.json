@@ -1,0 +1,16 @@
+{
+  "headings": {
+    "eventDetails": "Детайли за резервацията"
+  },
+  "labels": {
+    "consultationType": "резервирайте е за:",
+    "adult": "Възрастен",
+    "couple": "Двойка",
+    "child": "Дете",
+    "selectDate": "Изберете дата",
+    "selectTime": "Изберете час:",
+    "emailAddress": "email адрес",
+    "amount": "Сума за плащане:"
+  },
+  "date": "{{val, datetime}}"
+}

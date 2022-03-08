@@ -1,9 +1,9 @@
 exports.onCreateWebpackConfig = ({ stage, actions }) => {
-  actions.setWebpackConfig({
-    resolve: {
-      alias: {
-        '@material-ui/styled-engine': '@material-ui/styled-engine-sc',
-      },
-    },
-  })
+  // actions.setWebpackConfig({
+  //   resolve: {
+  //     alias: {
+  //       '@mui/styled-engine': '@mui/styled-engine-sc',
+  //     },
+  //   },
+  // })
 }

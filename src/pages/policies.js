@@ -1,6 +1,6 @@
 import React from "react"
 import { graphql } from "gatsby"
-import { Container, Paper, Stack, Typography } from '@material-ui/core'
+import { Container, Paper, Stack, Typography } from '@mui/material'
 import { useTranslation } from "gatsby-plugin-react-i18next"
 import Nav from "../components/Nav"
 import Footer from "../components/Footer"

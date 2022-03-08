@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { StaticImage } from "gatsby-plugin-image"
-import { styled } from '@material-ui/core/styles'
-import { Avatar, Button, ButtonGroup, Container, Stack } from '@material-ui/core';
-import PersonIcon from '@material-ui/icons/Person'
+import { styled } from '@mui/material/styles'
+import { Avatar, Button, ButtonGroup, Container, Stack } from '@mui/material';
+import PersonIcon from '@mui/icons-material/Person'
 import { isLoggedIn, getUser } from "../firebase"
 import { Link, useTranslation, useI18next } from 'gatsby-plugin-react-i18next';
 import firebase from "gatsby-plugin-firebase"

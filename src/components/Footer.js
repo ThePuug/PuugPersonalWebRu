@@ -1,6 +1,6 @@
 import React from "react"
-import { Container, Stack, Typography } from "@material-ui/core"
-import { styled } from "@material-ui/core/styles"
+import { Container, Stack, Typography } from "@mui/material"
+import { styled } from "@mui/material/styles"
 import { useTranslation, Link } from "gatsby-plugin-react-i18next"
 
 const Component = (props) => {

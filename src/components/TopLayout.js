@@ -1,7 +1,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import CssBaseline from '@material-ui/core/CssBaseline'
-import { ThemeProvider, StyledEngineProvider } from '@material-ui/core/styles'
+import CssBaseline from '@mui/material/CssBaseline'
+import { ThemeProvider, StyledEngineProvider } from '@mui/material/styles'
+import LocalizationProvider from "@mui/lab/LocalizationProvider"
+import AdapterLuxon from "@mui/lab/AdapterLuxon"
 import { Elements } from "@stripe/react-stripe-js"
 import { loadStripe } from "@stripe/stripe-js"
 import { Helmet } from 'gatsby-plugin-react-i18next';
@@ -18,10 +20,12 @@ export default function TopLayout(props) {
     </Helmet>
     <ThemeProvider theme={theme}>
       <StyledEngineProvider injectFirst>
-        <Elements stripe={stripe}>
-          <CssBaseline />
-          {props.children}
-        </Elements>
+        <LocalizationProvider dateAdapter={AdapterLuxon}>
+          <Elements stripe={stripe}>
+            <CssBaseline />
+            {props.children}
+          </Elements>
+        </LocalizationProvider>
       </StyledEngineProvider>
     </ThemeProvider>
   </>)
