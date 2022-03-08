@@ -4,7 +4,6 @@ import { DateTime, Duration } from 'luxon'
 import { Location } from '@reach/router'
 import queryString from 'query-string'
 import { styled } from "@mui/material/styles"
-import { cx, css } from '@emotion/css'
 import { Backdrop, Box, Button, ButtonGroup, Card, Container, Drawer, FormControl, FormHelperText, FormLabel, IconButton, LinearProgress, Paper, Stack, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material'
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
@@ -146,7 +145,7 @@ const Page = ({ search }) => {
       <Stack>
         <FormControl component="fieldset">
           <FormLabel>{t('labels.consultationType')}</FormLabel>
-          <ToggleButtonGroup exclusive value={sessionType} onChange={(_,v) => { if(!!v) setSessionType(v) }} className={cx(css`display:flex; flex-flow:row nowrap`)}>
+          <ToggleButtonGroup exclusive value={sessionType} onChange={(_,v) => { if(!!v) setSessionType(v) }} css={{display:`flex`, flexFlow:`row nowrap`}}>
             <ToggleButton value="individual" color="primary">{t('labels.adult')}</ToggleButton>
             <ToggleButton value="couple" color="primary">{t('labels.couple')}</ToggleButton>
             <ToggleButton value="child" color="primary">{t('labels.child')}</ToggleButton>
@@ -193,13 +192,13 @@ const Page = ({ search }) => {
     <SignIn open={isSigningIn} onClose={() => setIsSigningIn(false)} onSuccess={handleBookNow} />
 
     <Loads component={Drawer} loading={loading} open={isBooking} onClose={handleCloseBookingDialog} anchor="top">
-      <Container maxWidth="xs" className={cx(css`margin:1em auto; text-align:center`)}>
-        <div className={cx(css`position:relative; button { position:absolute; left:0; top:50%; margin-top:-1.5rem; &:last-child { right:0; left:unset; }}`)}>
+      <Container maxWidth="xs" css={{margin:`1em auto`, textAlign:`center`}}>
+        <div css={{position:`relative`, button: { position:`absolute`, left:`0`, top:`50%`, marginTop:`-1.5rem`, "&:last-child": { right:`0`, left:`unset` }}}}>
           <IconButton size="medium" aria-label="previous" onClick={() => handleChangeDay(-1)}><ArrowBackIcon /></IconButton>
           <Typography gutterBottom variant="h5">{t('date',{val:selectedDay.toJSDate(),formatParams:{val:{day:"numeric",month:"long",year:"numeric"}}})}</Typography>
           <IconButton size="medium" variant="outlined" aria-label="next" onClick={() => handleChangeDay(1)}><ArrowForwardIcon /></IconButton>
         </div>
-        <FormControl component="fieldset" className={cx(css`margin-bottom:1rem`)}>
+        <FormControl component="fieldset" css={{marginBottom:`1rem`}}>
           <FormLabel>{t('labels.selectTime')}</FormLabel>
           <Stack direction="column" color="primary">
             {Array.from({length:4},(_,k)=>createSlots(selectedDay,slots[k])).sort((a,b)=>a.date.hour-b.date.hour)
@@ -281,7 +280,7 @@ const _Slot = (props) => {
   const canView = (status) => isSignedIn && (status==="mine" || (status==="booked" && getUser().email==="rosanna.chizhova@gmail.com"))
 
   return <TimeslotButtonGroup fullWidth={true} active={active} status={status} {...rest}>
-    {!!duration && <Button disabled={!!disabled} onClick={_ => onSelectTimeslot(timeslot)} className={cx(css`flex-shrink:0`)}>
+    {!!duration && <Button disabled={!!disabled} onClick={_ => onSelectTimeslot(timeslot)} css={{flexShrink:`0`}}>
       {t('date',{val:timeslot.toJSDate(),formatParams:{val:{ hour:'2-digit', minute:'2-digit'}}})}&nbsp;
     </Button>}
     {!duration && !canView(status) && <Button></Button>}

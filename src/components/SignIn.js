@@ -1,5 +1,4 @@
 import React, {useState} from 'react'
-import { cx, css } from '@emotion/css'
 import { Button, Container, Dialog, Typography } from '@mui/material';
 import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
 import { isLoggedIn, getUser, setUser, logout } from "../firebase"
@@ -31,8 +30,8 @@ const Component = (props) => {
   })
 
   return (<>
-    {!!firebase.auth && <Loads component={Dialog} loading={loading} onClose={onClose} {...rest} maxWidth="xs" className={cx(css`text-align:center`)}>
-      <Container className={cx(css`margin:1em auto`)}>
+    {!!firebase.auth && <Loads component={Dialog} loading={loading} onClose={onClose} {...rest} maxWidth="xs" css={{textAlign:`center`}}>
+      <Container css={{margin:`1em auto`}}>
         {isLoggedIn() && <>
           <Typography variant="subtitle2">{t("signedInAs")} {getUser().displayName}</Typography>
           <Button variant="outlined" color="secondary" onClick={() => { logout(firebase); onClose(); }}>Log out</Button>

@@ -1,5 +1,4 @@
 import React, {useState} from "react"
-import { cx, css } from '@emotion/css'
 import { Button, Container, Drawer, FormControl, FormHelperText, Input, InputLabel, Stack, Typography } from "@mui/material";
 import { CardElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import firebase from "gatsby-plugin-firebase"
@@ -59,7 +58,7 @@ const Component = (props) => {
   }
 
   return <Loads component={Drawer} {...rest} loading={loading} anchor="top">
-    <Container maxWidth="sm" className={cx(css`margin:1em auto`)}>
+    <Container maxWidth="sm" css={{margin:`1em auto`}}>
       <Stack>
         <FormControl margin="normal">
           <InputLabel>{t('labels.emailAddress')}</InputLabel>
