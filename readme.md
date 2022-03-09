@@ -14,5 +14,12 @@
 - for local development, run `firebase emulators:start --only functions,auth,firestore` then you can use: `gatsby develop`
 - test ssr first build (`gatsby build`) then use: `firebase emulators:start`
 
+# Utility functions
+- install required modules: `npm install`
+- local development required you define a few other variables in `.env`
+- - set `FIREBASE_AUTH_EMULATOR_HOST` when you want to connect to the emulator, (usually to `localhost:9099`)
+- - set `GOOGLE_DEFAULT_CREDENTIALS` to point at your firebase project's admin sdk key file
+- Run scripts with `node <scriptname>`
+
 # Website URL
 https://artudoma.com/

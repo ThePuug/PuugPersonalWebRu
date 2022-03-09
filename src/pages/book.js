@@ -138,7 +138,7 @@ const Page = ({ search }) => {
     })
     return () => unregisterAuthObserver();
   }, [])
-  
+
   return (<>
     <Nav />
     <Container maxWidth="md">
@@ -267,6 +267,7 @@ const _Slot = (props) => {
   const { timeslot, duration, status, onView, active, onSelectTimeslot, disabled, ...rest } = props
   const { t } = useTranslation('book')
   const [isSignedIn,setIsSignedIn] = useState(isLoggedIn())
+  const [permissions,setPermissions] = useState({})
 
   useEffect(() => {
     const unregisterAuthObserver = firebase.auth().onAuthStateChanged(user => {
@@ -275,9 +276,14 @@ const _Slot = (props) => {
     return () => unregisterAuthObserver();
   }, [])
 
-  // TODO: dont hardcode admin email
-  // TODO: IMPORTANT checking against email address is not secure!
-  const canView = (status) => isSignedIn && (status==="mine" || (status==="booked" && getUser().email==="rosanna.chizhova@gmail.com"))
+  useEffect(() => {
+    if(isSignedIn && firebase.auth) firebase.auth().currentUser.getIdTokenResult().then(token => {
+      setPermissions(token.claims)
+    })
+    else setPermissions({})
+  }, [isSignedIn])
+
+  const canView = (status) => isSignedIn && (status==="mine" || (status==="booked" && permissions.CAN_VIEW_ALL_BOOKINGS))
 
   return <TimeslotButtonGroup fullWidth={true} active={active} status={status} {...rest}>
     {!!duration && <Button disabled={!!disabled} onClick={_ => onSelectTimeslot(timeslot)} css={{flexShrink:`0`}}>

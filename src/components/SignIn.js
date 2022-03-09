@@ -22,7 +22,7 @@ const Component = (props) => {
       scopes: [ 'user_birthday', 'public_profile' ],
     }],
     callbacks: {
-      signInSuccessWithAuthResult: (result) => {
+      signInSuccessWithAuthResult: async (result) => {
         setUser(result.user)
         onSuccess()
       },
