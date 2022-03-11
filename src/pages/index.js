@@ -1,7 +1,6 @@
 import React from "react"
 import { graphql, navigate } from "gatsby"
 import { StaticImage } from "gatsby-plugin-image"
-import { css } from "@emotion/css"
 import { styled } from "@mui/material/styles"
 import { Button, Card, CardActions, CardContent, CardHeader, CardMedia, Container, IconButton, Paper, Stack, Typography, List, ListItem, ListItemText } from '@mui/material'
 import { Attachment, Facebook, LinkedIn } from "@mui/icons-material"

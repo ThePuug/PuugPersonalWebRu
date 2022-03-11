@@ -70,26 +70,37 @@ const Page = ({ search }) => {
   const first = today.current.startOf('month').plus(Duration.fromObject({months:monthIndex}))
   const start = first.minus(Duration.fromObject({days:first.weekday%7}))
 
-
   const addBooking = useCallback((booking) => {
     setEvents(e => [...e,booking])
     return true
   },[])
   const clearBookings = useCallback(() => setEvents([]),[])
 
-  const handleSelectDay = (date) => {
+  const handleCloseView = () => {
+    setViewing(false)
+  }
+  const handleDelete = id => {
+    setEvents(events.filter(it => it.id !== id))
+    setViewing(false)
+  }
+  const handleUpdate = event => {
+    console.log(event)
+    setEvents([...(events.filter(it => it.id !== event.id)), event])
+    setViewing(false)
+  }
+  const handleSelectDay = date => {
     setSelectedDay(date)
     setIsBooking(true)
   }
-  const handleCloseBookingDialog = (_) => {
+  const handleCloseBookingDialog = _ => {
     setIsBooking(false)
     setTimeslot(null)
   }
-  const handleChangeDay = (v) => {
+  const handleChangeDay = v => {
     setSelectedDay(selectedDay.plus(Duration.fromObject({days:v})))
     setTimeslot(null);
   }
-  const handleBookNow = async (_) => {
+  const handleBookNow = async _ => {
     if(!isLoggedIn()) setIsSigningIn(true)
     else {
       if(isSigningIn) setIsSigningIn(false)
@@ -106,6 +117,7 @@ const Page = ({ search }) => {
     }
   }
   const onSuccessPay = doc => {
+    console.log(doc)
     setEvents(e => [...e, doc]);
     setIsPaying(false);
     setIsBooking(false);
@@ -123,15 +135,16 @@ const Page = ({ search }) => {
         snapshot.forEach(b => {
           const data = b.data()
           addBooking({
+            id: b.id,
             duration: data.duration,
             paymentReference: data.paymentReference,
             date: DateTime.fromJSDate(data.date.toDate()).toLocal(),
             userEmail: data.userEmail,
+            userId: data.userId,
             sessionType: data.sessionType,
           })})})
       .finally(() => setLoadingEvents(false))
   },[addBooking,clearBookings,monthIndex])
-
   useEffect(() => {
     const unregisterAuthObserver = firebase.auth().onAuthStateChanged(user => {
       setIsSignedIn(!!user)
@@ -207,9 +220,9 @@ const Page = ({ search }) => {
                 return <Slot key={i} 
                   onSelectTimeslot={t => setTimeslot(t)}
                   timeslot={s.date} 
-                  active={!!timeslot && conflicts(s,{date: timeslot, duration:120}) ? true : undefined}
+                  active={!!timeslot && conflicts(s,{date: timeslot, duration:120}) ? "true" : undefined}
                   disabled={evts.some(e => e.date<=today.current || conflicts(e,s))}
-                  status={evts.some(e => conflicts(e,s))?evts.some(e => isSignedIn && conflicts(e,s) && getUser().email===e.userEmail)?"mine":"booked":"free"}
+                  status={evts.some(e => conflicts(e,s))?evts.some(e => isSignedIn && conflicts(e,s) && getUser().uid===e.userId)?"mine":"booked":"free"}
                   duration={sessionType==="couple"?90:60}
                   onView={s => { setViewing(events.find(e => conflicts(e,s))); }}>
                 </Slot>
@@ -234,8 +247,11 @@ const Page = ({ search }) => {
       userEmail: getUser().email,
     }} onClose={() => setIsPaying(false)} onSuccess={onSuccessPay} />
 
-    <View open={!!viewing} event={viewing} onClose={() => setViewing(false)} />
-
+    <View open={!!viewing} 
+      event={viewing} 
+      onClose={handleCloseView} 
+      onDelete={handleDelete}
+      onUpdate={handleUpdate} />
     <Footer />
   </>)
 }
@@ -256,7 +272,7 @@ const _Day = (props) => {
           <Slot timeslot={s.date} 
             disabled={true}
             onSelectTimeslot={t => {}}
-            status={events.some(e => conflicts(e,s))?events.some(e => isSignedIn && conflicts(e,s) && getUser().email===e.userEmail)?"mine":"booked":"free"} 
+            status={events.some(e => conflicts(e,s))?events.some(e => isSignedIn && conflicts(e,s) && getUser().uid===e.userId)?"mine":"booked":"free"} 
             onView={onView} />
         </MonthSlot>)}
     </Card>
@@ -277,7 +293,7 @@ const _Slot = (props) => {
   }, [])
 
   useEffect(() => {
-    if(isSignedIn && firebase.auth) firebase.auth().currentUser.getIdTokenResult().then(token => {
+    if(isSignedIn && firebase.auth?.currentUser) firebase.auth().currentUser.getIdTokenResult().then(token => {
       setPermissions(token.claims)
     })
     else setPermissions({})
@@ -285,7 +301,7 @@ const _Slot = (props) => {
 
   const canView = (status) => isSignedIn && (status==="mine" || (status==="booked" && permissions.CAN_VIEW_ALL_BOOKINGS))
 
-  return <TimeslotButtonGroup fullWidth={true} active={active} status={status} {...rest}>
+  return <TimeslotButtonGroup fullWidth={true} active={active ? "true" : undefined} status={status} {...rest}>
     {!!duration && <Button disabled={!!disabled} onClick={_ => onSelectTimeslot(timeslot)} css={{flexShrink:`0`}}>
       {t('date',{val:timeslot.toJSDate(),formatParams:{val:{ hour:'2-digit', minute:'2-digit'}}})}&nbsp;
     </Button>}
@@ -302,7 +318,7 @@ const TimeslotButtonGroup = styled(ButtonGroup)`
     ? props.theme.palette.orange.main
     : props.status==="booked"
       ? props.theme.palette.blue.main
-      : props.active
+      : !!props.active
         ? props.theme.palette.red.main
         : props.theme.palette.teal.main};
 `

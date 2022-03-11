@@ -44,9 +44,14 @@ const Component = (props) => {
 
       if (confirmation.error) setError(`${t('errors.paymentFailed')} ${confirmation.error.message}. ${t('resolvers.safeToRetryPayment')}`);
       else {
-        const confirmedBooking = {...booking,paymentReference: confirmation.paymentIntent.id}
+        let confirmedBooking = {...booking,paymentReference: confirmation.paymentIntent.id}
         try {
-          await firebase.firestore().collection("bookings").add({...confirmedBooking, date: firebase.firestore.Timestamp.fromDate(confirmedBooking.date.setZone('Europe/Sofia').toJSDate()) })
+          confirmedBooking = {...confirmedBooking, 
+            date: firebase.firestore.Timestamp.fromDate(confirmedBooking.date.setZone('Europe/Sofia').toJSDate()),
+            userId: getUser().uid
+          }
+          var doc = await firebase.firestore().collection("bookings").add(confirmedBooking)
+          confirmedBooking = {...confirmedBooking,id:doc.id}
           onSuccess(confirmedBooking)
         } catch(err) { 
           setError(`${t('errors.general')} ${t('resolvers.callToConfirm')}`) 
