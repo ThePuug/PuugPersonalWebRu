@@ -293,7 +293,7 @@ const _Slot = (props) => {
   }, [])
 
   useEffect(() => {
-    if(isSignedIn && firebase.auth?.currentUser) firebase.auth().currentUser.getIdTokenResult().then(token => {
+    if(isSignedIn && firebase.auth && firebase.auth().currentUser) firebase.auth().currentUser.getIdTokenResult().then(token => {
       setPermissions(token.claims)
     })
     else setPermissions({})
