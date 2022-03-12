@@ -3,6 +3,7 @@ import { Button, Container, Drawer, FormControl, FormHelperText, Input, InputLab
 import { CardElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import firebase from "gatsby-plugin-firebase"
 import { useTranslation, Trans } from "gatsby-plugin-react-i18next";
+import { DateTime } from 'luxon'
 import { getUser } from "../firebase";
 import Loads from "./Loads"
 
@@ -44,14 +45,15 @@ const Component = (props) => {
 
       if (confirmation.error) setError(`${t('errors.paymentFailed')} ${confirmation.error.message}. ${t('resolvers.safeToRetryPayment')}`);
       else {
-        let confirmedBooking = {...booking,paymentReference: confirmation.paymentIntent.id}
+        let confirmedBooking = {...booking, 
+          paymentReference: confirmation.paymentIntent.id,
+          date: firebase.firestore.Timestamp.fromDate(booking.date.setZone('Europe/Sofia').toJSDate()),
+          userId: getUser().uid}
         try {
-          confirmedBooking = {...confirmedBooking, 
-            date: firebase.firestore.Timestamp.fromDate(confirmedBooking.date.setZone('Europe/Sofia').toJSDate()),
-            userId: getUser().uid
-          }
           var doc = await firebase.firestore().collection("bookings").add(confirmedBooking)
-          confirmedBooking = {...confirmedBooking,id:doc.id}
+          confirmedBooking = {...confirmedBooking, 
+            id:doc.id, 
+            date:DateTime.fromMillis(confirmedBooking.date.toMillis())}
           onSuccess(confirmedBooking)
         } catch(err) { 
           setError(`${t('errors.general')} ${t('resolvers.callToConfirm')}`) 

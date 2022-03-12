@@ -59,15 +59,10 @@ const Component = (props) => {
   useEffect(() => {
     const unregisterAuthObserver = firebase.auth().onAuthStateChanged(user => {
       setIsSignedIn(!!user)
+      user.getIdTokenResult().then(token => setPermissions(token.claims))
     })
     return () => unregisterAuthObserver();
   }, [])
-  useEffect(() => {
-    if(isSignedIn && firebase.auth && firebase.auth().currentUser) firebase.auth().currentUser.getIdTokenResult().then(token => {
-      setPermissions(token.claims)
-    })
-    else setPermissions({})
-  }, [isSignedIn])
   useEffect(() => {
     setSessionType(event.sessionType || "");
     setUserEmail(event.userEmail || "");

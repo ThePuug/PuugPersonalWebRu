@@ -117,7 +117,6 @@ const Page = ({ search }) => {
     }
   }
   const onSuccessPay = doc => {
-    console.log(doc)
     setEvents(e => [...e, doc]);
     setIsPaying(false);
     setIsBooking(false);
@@ -288,16 +287,10 @@ const _Slot = (props) => {
   useEffect(() => {
     const unregisterAuthObserver = firebase.auth().onAuthStateChanged(user => {
       setIsSignedIn(!!user)
+      user.getIdTokenResult().then(token => setPermissions(token.claims))
     })
     return () => unregisterAuthObserver();
   }, [])
-
-  useEffect(() => {
-    if(isSignedIn && firebase.auth && firebase.auth().currentUser) firebase.auth().currentUser.getIdTokenResult().then(token => {
-      setPermissions(token.claims)
-    })
-    else setPermissions({})
-  }, [isSignedIn])
 
   const canView = (status) => isSignedIn && (status==="mine" || (status==="booked" && permissions.CAN_VIEW_ALL_BOOKINGS))
 
