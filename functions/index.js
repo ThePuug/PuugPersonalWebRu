@@ -31,24 +31,42 @@ exports.stripePaymentIntent = functions.region("europe-central2").https.onCall(a
   return intent.client_secret
 })
 
-exports.deleteBooking = functions.region("europe-central2").https.onCall(async (data,context) => {
+exports.createBooking = functions.region("europe-central2").https.onCall(async (data,context) => {
   if(!context.auth) throw new functions.https.HttpsError("unauthenticated","not authorised")
-  if(!context.auth.token?.CAN_EDIT_BOOKING_DETAILS) throw new functions.https.HttpsError("unauthenticated","not authorised")
 
-  await admin.firestore().collection("bookings").doc(data.id).delete()
+  if((await stripe.paymentIntents.retrieve(data.paymentReference)).status != "succeeded")
+    throw new functions.https.HttpsError("invalid-argument","the provided payment reference is not valid")
+
+  if(await admin.firestore().collection("bookings").where('paymentReference','==',data.paymentReference).get().length > 0)
+    throw new functions.https.HttpsError("already-exists","A booking already exists for this payment")
+
+  const doc = await admin.firestore().collection("bookings").add({...data,
+    date: new Date(data.date)})
+  return { ...data,
+    id:doc.id
+  }
+})
+
+exports.deleteBooking = functions.region("europe-central2").https.onCall(async (data,context) => {
+  if(!context.auth || !context.auth.token?.CAN_EDIT_BOOKING_DETAILS) throw new functions.https.HttpsError("unauthenticated","not authorised")
+
+  var doc = await admin.firestore().collection("bookings").doc(data.id)
+  await doc.update({date: null})
+  return { ...(await doc.get()),
+    id:doc.id
+  }
 })
 
 exports.updateBooking = functions.region("europe-central2").https.onCall(async (data,context) => {
-  if(!context.auth) throw new functions.https.HttpsError("unauthenticated","not authorised")
-  if(!context.auth.token?.CAN_EDIT_BOOKING_DETAILS) throw new functions.https.HttpsError("unauthenticated","not authorised")
+  if(!context.auth || !context.auth.token?.CAN_EDIT_BOOKING_DETAILS) throw new functions.https.HttpsError("unauthenticated","not authorised")
 
-  var doc = admin.firestore().collection("bookings").doc(data.id)
+  const doc = admin.firestore().collection("bookings").doc(data.id)
   await doc.update({
     sessionType: data.sessionType,
     date: new Date(data.date),
     userEmail: data.userEmail
   })
-  var newData = await (await doc.get()).data()
+  const newData = await (await doc.get()).data()
   return { ...newData, 
     date:newData.date.toMillis(),
     id:doc.id}

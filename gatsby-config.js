@@ -7,6 +7,7 @@ module.exports = {
   plugins: [
     "gatsby-plugin-emotion",
     "gatsby-plugin-image",
+    "gatsby-plugin-material-ui",
     "gatsby-plugin-react-helmet",
     {
       resolve: "gatsby-plugin-manifest",

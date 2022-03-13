@@ -84,7 +84,6 @@ const Page = ({ search }) => {
     setViewing(false)
   }
   const handleUpdate = event => {
-    console.log(event)
     setEvents([...(events.filter(it => it.id !== event.id)), event])
     setViewing(false)
   }
@@ -287,7 +286,7 @@ const _Slot = (props) => {
   useEffect(() => {
     const unregisterAuthObserver = firebase.auth().onAuthStateChanged(user => {
       setIsSignedIn(!!user)
-      user.getIdTokenResult().then(token => setPermissions(token.claims))
+      if(!!user) user.getIdTokenResult().then(token => setPermissions(token.claims))
     })
     return () => unregisterAuthObserver();
   }, [])

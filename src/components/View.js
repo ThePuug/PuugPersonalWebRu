@@ -59,7 +59,7 @@ const Component = (props) => {
   useEffect(() => {
     const unregisterAuthObserver = firebase.auth().onAuthStateChanged(user => {
       setIsSignedIn(!!user)
-      user.getIdTokenResult().then(token => setPermissions(token.claims))
+      if(!!user) user.getIdTokenResult().then(token => setPermissions(token.claims))
     })
     return () => unregisterAuthObserver();
   }, [])
