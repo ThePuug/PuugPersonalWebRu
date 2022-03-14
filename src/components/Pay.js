@@ -63,21 +63,23 @@ const Component = (props) => {
   return <Loads component={Drawer} {...rest} loading={loading} anchor="top">
     <Container maxWidth="sm" css={{margin:`1em auto`}}>
       <Stack gap={2}>
-        <fieldset>
-          <FormControl margin="normal">
-            <InputLabel>{t('labels.emailAddress')}</InputLabel>
-            <Input readOnly value={getUser().email}></Input>
-            <FormHelperText>{t('helpers.emailReceipt')}</FormHelperText>
-          </FormControl>
-          <FormControl margin="normal">
-            <InputLabel shrink>{t('labels.cardDetails')}</InputLabel>
-            <Input inputComponent={RefCardElement} onChange={handleChange}/>
-            <FormHelperText error={!!error}>
-              {!error && <span>{t('helpers.neverStoreDetails')}</span>}
-              {!!error && <span>{error}</span>}
-            </FormHelperText>
-          </FormControl>
-          <Typography variant="subtitle">{t('labels.amount')} {booking.sessionType === "individual" ? 60 : booking.sessionType === 'couple' ? 75 : 40} лв</Typography>
+          <fieldset>
+          <Stack direction="column" gap={2}>
+            <FormControl margin="normal">
+              <InputLabel>{t('labels.emailAddress')}</InputLabel>
+              <Input readOnly value={getUser().email}></Input>
+              <FormHelperText>{t('helpers.emailReceipt')}</FormHelperText>
+            </FormControl>
+            <FormControl margin="normal">
+              <InputLabel shrink>{t('labels.cardDetails')}</InputLabel>
+              <Input inputComponent={RefCardElement} onChange={handleChange}/>
+              <FormHelperText error={!!error}>
+                {!error && <span>{t('helpers.neverStoreDetails')}</span>}
+                {!!error && <span>{error}</span>}
+              </FormHelperText>
+            </FormControl>
+            <Typography variant="subtitle">{t('labels.amount')} {booking.sessionType === "individual" ? 60 : booking.sessionType === 'couple' ? 75 : 40} лв</Typography>
+          </Stack>
         </fieldset>
         <fieldset>
           <Stack direction="row" justifyContent="stretch">
