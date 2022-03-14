@@ -152,9 +152,9 @@ const Page = ({ search }) => {
 
   return (<>
     <Nav />
-    <Container maxWidth="md">
+    <Container maxWidth="md" css={{padding:0}}>
       <FormControl component="fieldset">
-        <FormLabel component="legend">{t('labels.selectDate')}</FormLabel>
+        <FormLabel component="legend" css={{paddingLeft:"1em"}}>{t('labels.selectDate')}</FormLabel>
           <Loads component={Calendar} loading={loadingEvents} elevation={3} style={{position:focused ? "fixed" : "relative"}}>
             <Navigation>
               <IconButton size="medium" variant="contained" onClick={() => {setMonthIndex(monthIndex-1)}}><NavigateBeforeIcon /></IconButton>
@@ -279,7 +279,7 @@ const _Day = (props) => {
   };
   return (
     <Card {...rest} variant="outlined" onClick={handleClick} onMouseDown={handleMouseDown}>
-      <DayLabel>{date.day}</DayLabel>
+      <DayLabel css={{padding:0}}>{date.day}</DayLabel>
       {Array.from({length:4},(_,k)=>createSlots(date,slots[k])).sort((a,b)=>a.date.hour-b.date.hour)
         .map((s,i) => <MonthSlot key={i}>
           <Slot timeslot={s.date} 
@@ -355,7 +355,6 @@ const Navigation = styled(Container)`
   flex-direction:row;
   align-items:center;
   flex:0 0;
-  margin:0 1em;
 `
 
 const Label = styled(Typography)`
@@ -386,7 +385,6 @@ const DayLabels = styled(Container)`
 
 const MonthColLabel = styled(Container)`
   text-align:center;
-  padding:.5em;
   box-sizing:border-box;
   flex:1 0 14.2857%;
   margin:0px;
