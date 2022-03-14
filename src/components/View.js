@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react'
-import { Box, Button, Container, Drawer, FormHelperText, IconButton, FormControl, FormLabel, Stack, TextField, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
+import React, { useEffect, useRef, useState } from 'react'
+import { Box, Button, Container, Drawer, FormHelperText, IconButton, FormControl, FormLabel, Slide, Stack, TextField, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
 import { DateTimePicker } from "@mui/lab"
 import CancelIcon from '@mui/icons-material/Cancel';
 import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
@@ -8,6 +8,7 @@ import { useTranslation } from "gatsby-plugin-react-i18next";
 import { DateTime } from 'luxon'
 import firebase from "gatsby-plugin-firebase"
 import { isLoggedIn } from "../firebase"
+import theme from '../theme'
 
 const Component = (props) => {
   const { t } = useTranslation('_view')
@@ -20,6 +21,7 @@ const Component = (props) => {
   const [confirmDelete,setConfirmDelete] = useState(false)
   const [confirmRefund,setConfirmRefund] = useState(false)
   const [error,setError] = useState(null)
+  const actionContainer = useRef(null)
 
   const handleClose = () => {
     setConfirmDelete(false)
@@ -92,18 +94,28 @@ const Component = (props) => {
           </Stack>
         </fieldset>
         <fieldset>
-          {permissions['CAN_EDIT_BOOKING_DETAILS'] && <Stack direction="row" justifyContent="space-between">
-            {!confirmDelete && <>
-              <Stack direction="row" gap={2}>
-                <Button variant="contained" onClick={() => handleUpdate(event)}>Update</Button>
-                <Button variant="outlined" startIcon={<DeleteForeverIcon />} onClick={() => setConfirmDelete(true)}>Delete</Button>
-              </Stack>
-              <Button variant="text" onClick={handleClose}>Close</Button>
-            </>}
-            {confirmDelete && <>
-              <Button variant="contained" startIcon={<DeleteForeverIcon/>} onClick={() => handleDelete(event.id)}>Confirm delete</Button>
-              <IconButton onClick={handleCancelDelete}><CancelIcon /></IconButton>
-            </>}
+          {permissions['CAN_EDIT_BOOKING_DETAILS'] && <Stack direction="row" >
+            <Box ref={actionContainer} css={{overflow:'hidden', position:'relative', flexGrow:1}}>
+              <Slide in={!confirmDelete} 
+                direction="left"
+                css={{position:"absolute"}}
+                appear={false}
+                container={actionContainer.current}>
+                <Stack direction="row" gap={2}>
+                  <Button variant="contained" onClick={() => handleUpdate(event)}>Update</Button>
+                  <Button variant="outlined" startIcon={<DeleteForeverIcon />} onClick={() => setConfirmDelete(true)}>Delete</Button>
+                </Stack>
+              </Slide>
+              <Slide in={confirmDelete} 
+                direction="right"
+                container={actionContainer.current}>
+                <Button variant="contained" color="error" startIcon={<DeleteForeverIcon/>} onClick={() => handleDelete(event.id)}>Confirm delete</Button>
+              </Slide>
+            </Box>
+            <Box style={{flexGrow:0}}>
+              {!confirmDelete && <Button variant="text" onClick={handleClose}>Close</Button>}
+              {confirmDelete && <IconButton onClick={handleCancelDelete}><CancelIcon /></IconButton>}
+            </Box>
           </Stack>}
           {!permissions['CAN_EDIT_BOOKING_DETAILS'] && <Stack direction="row" justifyContent="space-between">
             {!confirmRefund && <>

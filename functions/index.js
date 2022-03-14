@@ -35,7 +35,10 @@ exports.createBooking = functions.region("europe-central2").https.onCall(async (
   if(!context.auth) throw new functions.https.HttpsError("unauthenticated","not authorised")
 
   if((await stripe.paymentIntents.retrieve(data.paymentReference)).status != "succeeded")
-    throw new functions.https.HttpsError("invalid-argument","the provided payment reference is not valid")
+    throw new functions.https.HttpsError("not-found","the payment reference is not valid")
+
+  if((await stripe.refunds.list({payment_intent:data.paymentReference})).data.some(refund => refund.status == "succeeded"))
+    throw new functions.https.HttpsError("cancelled","the provided payment has been refunded")
 
   if(await admin.firestore().collection("bookings").where('paymentReference','==',data.paymentReference).get().length > 0)
     throw new functions.https.HttpsError("already-exists","A booking already exists for this payment")
