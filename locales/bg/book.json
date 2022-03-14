@@ -15,7 +15,8 @@
     "selectTime": "Изберете час:"
   },
   "buttons": {
-    "bookNow": "Резервирайте сега"
+    "bookNow": "Резервирайте сега",
+    "close": "Назад"
   },
   "date": "{{val, datetime}}"
 }

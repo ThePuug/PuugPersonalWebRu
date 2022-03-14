@@ -9,8 +9,15 @@
     "child": "Child",
     "selectDate": "Select a date",
     "selectTime": "Select a time slot:",
-    "emailAddress": "Email address:",
-    "amount": "Amount to be charged:"
+    "email": "Email address:",
+    "amount": "Amount to be charged:",
+    "date": "Date:"
+  },
+  "buttons": {
+    "close": "Close",
+    "delete": "Delete",
+    "confirmDelete": "Confirm delete",
+    "save": "Save"
   },
   "date": "{{val, datetime}}"
 }

@@ -8,7 +8,6 @@ import { useTranslation } from "gatsby-plugin-react-i18next";
 import { DateTime } from 'luxon'
 import firebase from "gatsby-plugin-firebase"
 import { isLoggedIn } from "../firebase"
-import theme from '../theme'
 
 const Component = (props) => {
   const { t } = useTranslation('_view')
@@ -89,43 +88,52 @@ const Component = (props) => {
               </ToggleButtonGroup>
             </FormControl>
             <FormControl>
-              <DateTimePicker renderInput={props => <TextField {...props} />} label="Date" value={date} onChange={v => setDate(v) } />
+              <DateTimePicker renderInput={props => <TextField {...props} />} label={t('labels.date')} value={date} onChange={v => setDate(v) } />
             </FormControl>
           </Stack>
         </fieldset>
         <fieldset>
-          {permissions['CAN_EDIT_BOOKING_DETAILS'] && <Stack direction="row" >
+          {permissions['CAN_EDIT_BOOKING_DETAILS'] && <Stack direction="row" gap={1}>
             <Box ref={actionContainer} css={{overflow:'hidden', position:'relative', flexGrow:1}}>
               <Slide in={!confirmDelete} 
                 direction="left"
                 css={{position:"absolute"}}
                 appear={false}
                 container={actionContainer.current}>
-                <Stack direction="row" gap={2}>
-                  <Button variant="contained" onClick={() => handleUpdate(event)}>Update</Button>
-                  <Button variant="outlined" startIcon={<DeleteForeverIcon />} onClick={() => setConfirmDelete(true)}>Delete</Button>
+                <Stack direction="row" gap={1}>
+                  <Button variant="contained" 
+                    size="small" 
+                    onClick={() => handleUpdate(event)}>{t('buttons.save')}</Button>
+                  <Button variant="outlined" 
+                    size="small" 
+                    startIcon={<DeleteForeverIcon />} 
+                    onClick={() => setConfirmDelete(true)}>{t('buttons.delete')}</Button>
                 </Stack>
               </Slide>
               <Slide in={confirmDelete} 
                 direction="right"
                 container={actionContainer.current}>
-                <Button variant="contained" color="error" startIcon={<DeleteForeverIcon/>} onClick={() => handleDelete(event.id)}>Confirm delete</Button>
+                <Button variant="contained" 
+                  color="error" 
+                  size="small" 
+                  startIcon={<DeleteForeverIcon/>} 
+                  onClick={() => handleDelete(event.id)}>{t('buttons.confirmDelete')}</Button>
               </Slide>
             </Box>
             <Box style={{flexGrow:0}}>
-              {!confirmDelete && <Button variant="text" onClick={handleClose}>Close</Button>}
-              {confirmDelete && <IconButton onClick={handleCancelDelete}><CancelIcon /></IconButton>}
+              {!confirmDelete && <Button variant="text" size="small" onClick={handleClose}>{t('buttons.close')}</Button>}
+              {confirmDelete && <IconButton size="small" onClick={handleCancelDelete}><CancelIcon /></IconButton>}
             </Box>
           </Stack>}
           {!permissions['CAN_EDIT_BOOKING_DETAILS'] && <Stack direction="row" justifyContent="space-between">
             {!confirmRefund && <>
               {/*<Button startIcon={<CurrencyExchangeIcon/>} variant="outlined" onClick={e => setConfirmRefund(true)}>Request refund</Button>*/}
               <Box></Box>
-              <Button variant="text" onClick={handleClose}>Close</Button>
+              <Button variant="text" size="small" onClick={handleClose}>{t('buttons.close')}</Button>
             </>}
             {confirmRefund && <>
-              <Button startIcon={<CurrencyExchangeIcon/>} variant="contained">Confirm refund request</Button>
-              <IconButton onClick={() => setConfirmRefund(false)}><CancelIcon /></IconButton>
+              <Button startIcon={<CurrencyExchangeIcon/>} size="small" variant="contained">Confirm refund request</Button>
+              <IconButton size="small" onClick={() => setConfirmRefund(false)}><CancelIcon /></IconButton>
             </>}
           </Stack>}
           {!!error && <FormHelperText error>{error}</FormHelperText>}

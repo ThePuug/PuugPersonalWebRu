@@ -9,8 +9,15 @@
     "child": "Дете",
     "selectDate": "Изберете дата",
     "selectTime": "Изберете час:",
-    "emailAddress": "email адрес",
-    "amount": "Сума за плащане:"
+    "email": "email адрес",
+    "amount": "Сума за плащане:",
+    "date": "Дата:"
+  },
+  "buttons": {
+    "close": "Назад",
+    "delete": "Отказ",
+    "confirmDelete": "Потвърдете отказа",
+    "save": "Запазване"
   },
   "date": "{{val, datetime}}"
 }

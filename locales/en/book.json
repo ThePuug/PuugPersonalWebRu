@@ -7,7 +7,7 @@
     "thenContactToBook": "If you're still unable to book your appointment, please contact us by phone or email!"
   },
   "labels": {
-    "consultationType": "Please select the type of session you want to book:",
+    "consultationType": "Who is the booking for?",
     "adult": "Adult",
     "couple": "Couple",
     "child": "Child",
@@ -15,7 +15,8 @@
     "selectTime": "Select a time slot:"
   },
   "buttons": {
-    "bookNow": "Book now"
+    "bookNow": "Book now",
+    "close": "Close"
   },
   "date": "{{val, datetime}}"
 }

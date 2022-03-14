@@ -240,7 +240,7 @@ const Page = ({ search }) => {
           <fieldset>
             <Stack direction="row" justifyContent="space-between">
               <Button variant="contained" disabled={!timeslot || loading} onClick={handleBookNow}>{t('buttons.bookNow')}</Button>
-              <Button variant="text" onClick={handleCloseBookingDialog}>Close</Button>
+              <Button variant="text" onClick={handleCloseBookingDialog}>{t('buttons.close')}</Button>
             </Stack>
             {!!error && <FormHelperText error={true}>
                 <span>{error}</span>
