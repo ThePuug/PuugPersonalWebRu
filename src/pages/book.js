@@ -153,86 +153,101 @@ const Page = ({ search }) => {
   return (<>
     <Nav />
     <Container maxWidth="md">
-      <Stack>
-        <FormControl component="fieldset">
-          <FormLabel>{t('labels.consultationType')}</FormLabel>
-          <ToggleButtonGroup exclusive value={sessionType} onChange={(_,v) => { if(!!v) setSessionType(v) }} css={{display:`flex`, flexFlow:`row nowrap`}}>
-            <ToggleButton value="individual" color="primary">{t('labels.adult')}</ToggleButton>
-            <ToggleButton value="couple" color="primary">{t('labels.couple')}</ToggleButton>
-            <ToggleButton value="child" color="primary">{t('labels.child')}</ToggleButton>
-          </ToggleButtonGroup>
-        </FormControl>
-        <FormControl component="fieldset">
-          <FormLabel component="legend">{t('labels.selectDate')}</FormLabel>
-            <Loads component={Calendar} loading={loadingEvents} elevation={3} style={{position:focused ? "fixed" : "relative"}}>
-              <Navigation>
-                <IconButton size="medium" variant="contained" onClick={() => {setMonthIndex(monthIndex-1)}}><NavigateBeforeIcon /></IconButton>
-                <Label>{t('date',{val:first.toJSDate(),formatParams:{val:{month:'long'}}})}</Label>
-                <IconButton size="medium" variant="contained" onClick={() => {setMonthIndex(monthIndex+1)}}><NavigateNextIcon /></IconButton>
-                {focused && <IconButton size="medium" variant="contained" onClick={() => setFocused(false)}><FullscreenExitIcon /></IconButton>}
-                {!focused && <IconButton size="medium" variant="contained" onClick={() => setFocused(true)}><FullscreenIcon /></IconButton>}
-              </Navigation>
-              <MonthLayout elevation={0}>
-                <DayLabels>{[
-                  t('date',{val:start,formatParams:{val:{weekday:'narrow'}}}),
-                  t('date',{val:start.plus({days:1}),formatParams:{val:{weekday:'narrow'}}}),
-                  t('date',{val:start.plus({days:2}),formatParams:{val:{weekday:'narrow'}}}),
-                  t('date',{val:start.plus({days:3}),formatParams:{val:{weekday:'narrow'}}}),
-                  t('date',{val:start.plus({days:4}),formatParams:{val:{weekday:'narrow'}}}),
-                  t('date',{val:start.plus({days:5}),formatParams:{val:{weekday:'narrow'}}}),
-                  t('date',{val:start.plus({days:6}),formatParams:{val:{weekday:'narrow'}}})].map((day,i) => <MonthColLabel key={i}>{day}</MonthColLabel>)}</DayLabels>
-                {Array.from({length:6},(_,k)=>(k)).map(week => {
-                  return <Week key={week}>
-                    {Array.from({length:7},(_,k)=>(k)).map(day => {
-                      const date = first.minus(Duration.fromObject({days:first.weekday%7})).plus(Duration.fromObject({days:(week)*7+day}))
-                      return (<Day key={day} 
-                        date={date} 
-                        handleSelect={handleSelectDay} 
-                        selectable={date > today.current} isSignedIn={isSignedIn}
-                        events={events.filter(e => e.date.ordinal === date.ordinal)} 
-                        onView={s => { setViewing(events.find(e => conflicts(e,s))); }} />)
-                    })}
-                  </Week>
-                })}
-              </MonthLayout>
-            </Loads>
-        </FormControl>
-      </Stack>
+      <FormControl component="fieldset">
+        <FormLabel component="legend">{t('labels.selectDate')}</FormLabel>
+          <Loads component={Calendar} loading={loadingEvents} elevation={3} style={{position:focused ? "fixed" : "relative"}}>
+            <Navigation>
+              <IconButton size="medium" variant="contained" onClick={() => {setMonthIndex(monthIndex-1)}}><NavigateBeforeIcon /></IconButton>
+              <Label>{t('date',{val:first.toJSDate(),formatParams:{val:{month:'long'}}})}</Label>
+              <IconButton size="medium" variant="contained" onClick={() => {setMonthIndex(monthIndex+1)}}><NavigateNextIcon /></IconButton>
+              {focused && <IconButton size="medium" variant="contained" onClick={() => setFocused(false)}><FullscreenExitIcon /></IconButton>}
+              {!focused && <IconButton size="medium" variant="contained" onClick={() => setFocused(true)}><FullscreenIcon /></IconButton>}
+            </Navigation>
+            <MonthLayout elevation={0}>
+              <DayLabels>{[
+                t('date',{val:start,formatParams:{val:{weekday:'narrow'}}}),
+                t('date',{val:start.plus({days:1}),formatParams:{val:{weekday:'narrow'}}}),
+                t('date',{val:start.plus({days:2}),formatParams:{val:{weekday:'narrow'}}}),
+                t('date',{val:start.plus({days:3}),formatParams:{val:{weekday:'narrow'}}}),
+                t('date',{val:start.plus({days:4}),formatParams:{val:{weekday:'narrow'}}}),
+                t('date',{val:start.plus({days:5}),formatParams:{val:{weekday:'narrow'}}}),
+                t('date',{val:start.plus({days:6}),formatParams:{val:{weekday:'narrow'}}})].map((day,i) => <MonthColLabel key={i}>{day}</MonthColLabel>)}</DayLabels>
+              {Array.from({length:6},(_,k)=>(k)).map(week => {
+                return <Week key={week}>
+                  {Array.from({length:7},(_,k)=>(k)).map(day => {
+                    const date = first.minus(Duration.fromObject({days:first.weekday%7})).plus(Duration.fromObject({days:(week)*7+day}))
+                    return (<Day key={day} 
+                      date={date} 
+                      handleSelect={handleSelectDay} 
+                      selectable={date > today.current} isSignedIn={isSignedIn}
+                      events={events.filter(e => e.date.ordinal === date.ordinal)} 
+                      onView={s => { setViewing(events.find(e => conflicts(e,s))); }} />)
+                  })}
+                </Week>
+              })}
+            </MonthLayout>
+          </Loads>
+      </FormControl>
     </Container>
 
     <SignIn open={isSigningIn} onClose={() => setIsSigningIn(false)} onSuccess={handleBookNow} />
 
     <Loads component={Drawer} loading={loading} open={isBooking} onClose={handleCloseBookingDialog} anchor="top">
       <Container maxWidth="xs" css={{margin:`1em auto`, textAlign:`center`}}>
-        <div css={{position:`relative`, button: { position:`absolute`, left:`0`, top:`50%`, marginTop:`-1.5rem`, "&:last-child": { right:`0`, left:`unset` }}}}>
-          <IconButton size="medium" aria-label="previous" onClick={() => handleChangeDay(-1)}><ArrowBackIcon /></IconButton>
-          <Typography gutterBottom variant="h5">{t('date',{val:selectedDay.toJSDate(),formatParams:{val:{day:"numeric",month:"long",year:"numeric"}}})}</Typography>
-          <IconButton size="medium" variant="outlined" aria-label="next" onClick={() => handleChangeDay(1)}><ArrowForwardIcon /></IconButton>
-        </div>
-        <FormControl component="fieldset" css={{marginBottom:`1rem`}}>
-          <FormLabel>{t('labels.selectTime')}</FormLabel>
-          <Stack direction="column" color="primary">
-            {Array.from({length:4},(_,k)=>createSlots(selectedDay,slots[k])).sort((a,b)=>a.date.hour-b.date.hour)
-              .map((s,i) => {
-                const evts = events.filter(event => event.date.ordinal===selectedDay.ordinal)
-                return <Slot key={i} 
-                  onSelectTimeslot={t => setTimeslot(t)}
-                  timeslot={s.date} 
-                  active={!!timeslot && conflicts(s,{date: timeslot, duration:120}) ? "true" : undefined}
-                  disabled={evts.some(e => e.date<=today.current || conflicts(e,s))}
-                  status={evts.some(e => conflicts(e,s))?evts.some(e => isSignedIn && conflicts(e,s) && getUser().uid===e.userId)?"mine":"booked":"free"}
-                  duration={sessionType==="couple"?90:60}
-                  onView={s => { setViewing(events.find(e => conflicts(e,s))); }}>
-                </Slot>
-            })}
-          </Stack>
-        </FormControl>
-        <Typography variant="h5" color="secondary">{sessionType === "individual" ? 60 : sessionType === 'couple' ? 75 : 40} лв</Typography>
-        <Button variant="outlined" color="primary" disabled={!timeslot || loading} onClick={handleBookNow}>{t('buttons.bookNow')}</Button>
-        {!!error && <FormHelperText error={true}>
-            <span>{error}</span>
-          </FormHelperText>
-        }
+        <Stack direction="column" gap={2}>
+          <div css={{position:`relative`, button: { position:`absolute`, left:`0`, top:`50%`, marginTop:`-1.5rem`, "&:last-child": { right:`0`, left:`unset` }}}}>
+            <IconButton size="medium" aria-label="previous" onClick={() => handleChangeDay(-1)}><ArrowBackIcon /></IconButton>
+            <Typography gutterBottom variant="h5">{t('date',{val:selectedDay.toJSDate(),formatParams:{val:{day:"numeric",month:"long",year:"numeric"}}})}</Typography>
+            <IconButton size="medium" variant="outlined" aria-label="next" onClick={() => handleChangeDay(1)}><ArrowForwardIcon /></IconButton>
+          </div>
+          <fieldset>
+            <Stack direction="column" gap={2}>
+              <FormControl component="fieldset">
+                <FormLabel>{t('labels.consultationType')}</FormLabel>
+                <ToggleButtonGroup exclusive 
+                  value={sessionType} 
+                  onChange={(_,v) => { if(!!v) setSessionType(v) }} 
+                  fullWidth
+                  orientation="horizontal">
+                  <ToggleButton value="individual" color="primary">{t('labels.adult')}</ToggleButton>
+                  <ToggleButton value="couple" color="primary">{t('labels.couple')}</ToggleButton>
+                  <ToggleButton value="child" color="primary">{t('labels.child')}</ToggleButton>
+                </ToggleButtonGroup>
+              </FormControl>
+              <Stack direction="row" justifyContent="space-around" alignItems="center">
+                <FormControl component="fieldset" css={{marginBottom:`1rem`}}>
+                  <FormLabel>{t('labels.selectTime')}</FormLabel>
+                  <Stack direction="column" color="primary">
+                    {Array.from({length:4},(_,k)=>createSlots(selectedDay,slots[k])).sort((a,b)=>a.date.hour-b.date.hour)
+                      .map((s,i) => {
+                        const evts = events.filter(event => event.date.ordinal===selectedDay.ordinal)
+                        return <Slot key={i} 
+                          onSelectTimeslot={t => setTimeslot(t)}
+                          timeslot={s.date} 
+                          active={!!timeslot && conflicts(s,{date: timeslot, duration:120}) ? "true" : undefined}
+                          disabled={evts.some(e => e.date<=today.current || conflicts(e,s))}
+                          status={evts.some(e => conflicts(e,s))?evts.some(e => isSignedIn && conflicts(e,s) && getUser().uid===e.userId)?"mine":"booked":"free"}
+                          duration={sessionType==="couple"?90:60}
+                          onView={s => { setViewing(events.find(e => conflicts(e,s))); }}>
+                        </Slot>
+                    })}
+                  </Stack>
+                </FormControl>
+                <Typography variant="h5" color="secondary">{sessionType === "individual" ? 60 : sessionType === 'couple' ? 75 : 40} лв</Typography>
+              </Stack>
+            </Stack>            
+          </fieldset>
+          <fieldset>
+            <Stack direction="row" justifyContent="space-between">
+              <Button variant="contained" disabled={!timeslot || loading} onClick={handleBookNow}>{t('buttons.bookNow')}</Button>
+              <Button variant="text" onClick={handleCloseBookingDialog}>Close</Button>
+            </Stack>
+            {!!error && <FormHelperText error={true}>
+                <span>{error}</span>
+              </FormHelperText>
+            }
+          </fieldset>
+        </Stack>
       </Container>
       {loading && <LinearProgress />}
       <Backdrop invisible open={loading} />

@@ -1,5 +1,6 @@
 import React, {useState} from "react"
-import { Button, Container, Drawer, FormControl, FormHelperText, Input, InputLabel, Stack, Typography } from "@mui/material";
+import { Button, Container, Drawer, FormControl, FormHelperText, IconButton, Input, InputLabel, Stack, Typography } from "@mui/material";
+import CancelIcon from '@mui/icons-material/Cancel';
 import { CardElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import firebase from "gatsby-plugin-firebase"
 import { useTranslation, Trans } from "gatsby-plugin-react-i18next";
@@ -15,7 +16,7 @@ const CARD_OPTIONS = {
 }
 
 const Component = (props) => {
-  const { booking, intent, onSuccess, ...rest } = props
+  const { booking, intent, onSuccess, onClose, ...rest } = props
   const { t } = useTranslation('_pay')
   const stripe = useStripe()
   const elements = useElements()
@@ -61,29 +62,38 @@ const Component = (props) => {
 
   return <Loads component={Drawer} {...rest} loading={loading} anchor="top">
     <Container maxWidth="sm" css={{margin:`1em auto`}}>
-      <Stack>
-        <FormControl margin="normal">
-          <InputLabel>{t('labels.emailAddress')}</InputLabel>
-          <Input readOnly value={getUser().email}></Input>
-          <FormHelperText>{t('helpers.emailReceipt')}</FormHelperText>
-        </FormControl>
-        <FormControl margin="normal">
-          <InputLabel shrink>{t('labels.cardDetails')}</InputLabel>
-          <Input inputComponent={RefCardElement} onChange={handleChange}/>
-          <FormHelperText error={!!error}>
-            {!error && <span>{t('helpers.neverStoreDetails')}</span>}
-            {!!error && <span>{error}</span>}
-          </FormHelperText>
-        </FormControl>
-        <Typography variant="subtitle">{t('labels.amount')} {booking.sessionType === "individual" ? 60 : booking.sessionType === 'couple' ? 75 : 40} лв</Typography>
-        <FormControl margin="normal">
-          <Button variant="contained" disabled={!stripe || disabled} color="primary" onClick={() => handlePay(intent)}>{t('buttons.pay')}</Button>
+      <Stack gap={2}>
+        <fieldset>
+          <FormControl margin="normal">
+            <InputLabel>{t('labels.emailAddress')}</InputLabel>
+            <Input readOnly value={getUser().email}></Input>
+            <FormHelperText>{t('helpers.emailReceipt')}</FormHelperText>
+          </FormControl>
+          <FormControl margin="normal">
+            <InputLabel shrink>{t('labels.cardDetails')}</InputLabel>
+            <Input inputComponent={RefCardElement} onChange={handleChange}/>
+            <FormHelperText error={!!error}>
+              {!error && <span>{t('helpers.neverStoreDetails')}</span>}
+              {!!error && <span>{error}</span>}
+            </FormHelperText>
+          </FormControl>
+          <Typography variant="subtitle">{t('labels.amount')} {booking.sessionType === "individual" ? 60 : booking.sessionType === 'couple' ? 75 : 40} лв</Typography>
+        </fieldset>
+        <fieldset>
+          <Stack direction="row" justifyContent="stretch">
+            <Button 
+              variant="contained" 
+              disabled={!stripe || disabled} 
+              css={{flexGrow:1}}
+              onClick={() => handlePay(intent)}>{t('buttons.pay')}</Button>
+            <IconButton variant="text" onClick={onClose}><CancelIcon /></IconButton>
+          </Stack>
           <FormHelperText>
             <Trans i18nKey="helpers.paymentProcessedBy">
               <a href="https://stripe.com/about" target="_blank" rel="noreferrer"></a>
             </Trans>
           </FormHelperText>
-        </FormControl>
+        </fieldset>
       </Stack>
     </Container>
   </Loads>
