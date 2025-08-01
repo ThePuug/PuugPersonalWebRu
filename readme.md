@@ -1,3 +1,6 @@
+# Introduction
+The purpose of this demo app was to showcase a custom developed scheduling and payment system that is mobile ready and integrated with Stripe payment provider.
+
 # Getting started
 - install node.js which includes npm from: https://nodejs.org/en/download/
 - get the repo `git clone https://github.com/unliketea/PuugPersonalWebRu.git` 
