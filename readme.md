@@ -33,5 +33,7 @@
     - New https callable function require permissions for `allUsers` as `Function Invoker` at: https://console.cloud.google.com/functions/list?project=puugpersonalwebru
 - deploy firebase firestore rules with `firebase deploy --only firestore:rules`
 
-# Website URL
-https://artudoma.com/
+# Demo
+https://puugpersonalwebru.web.app
+
+you can "pay" for reservations using the stripe test cards: https://docs.stripe.com/testing#cards
