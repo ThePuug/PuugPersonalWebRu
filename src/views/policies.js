@@ -1,9 +1,9 @@
+'use client'
 import React from "react"
-import { graphql } from "gatsby"
 import { Container, Paper, Stack, Typography } from '@mui/material'
-import { useTranslation } from "gatsby-plugin-react-i18next"
-import Nav from "../components/Nav"
-import Footer from "../components/Footer"
+import { useTranslation } from "react-i18next"
+import Nav from "@/components/Nav"
+import Footer from "@/components/Footer"
 
 const Page = (props) => {
   const { t } = useTranslation("policies")
@@ -16,7 +16,7 @@ const Page = (props) => {
           <Typography variant="body1"><em>Last updated: June 19, 2022</em></Typography>
           <Typography variant="body1" paragraph>We value your privacy, and with this page, we want to clearly communicate what data we collect and how we use it and also inform you of your rights to privacy while using artudoma.com site.</Typography>
           <Typography variant="h5">Using Your Personal Data</Typography>
-          <Typography variant="body1" paragraph>We aim to collect as little data as possible while still providing our service. In order to provide a platform that is robust, secure, and easy-to-use, we may use collected data in the following ways:
+          <Typography variant="body1" paragraph component="div">We aim to collect as little data as possible while still providing our service. In order to provide a platform that is robust, secure, and easy-to-use, we may use collected data in the following ways:
             <ul>
               <li>To provide and maintain our service, including analysis of how the site is used</li>
               <li>To manage your account, before and after registration</li>
@@ -71,17 +71,3 @@ const Page = (props) => {
 }
 
 export default Page
-
-export const query = graphql`
-  query ($language: String!) {
-    locales: allLocale(filter: {language: {eq: $language}}) {
-      edges {
-        node {
-          ns
-          data
-          language
-        }
-      }
-    }
-  }
-`;

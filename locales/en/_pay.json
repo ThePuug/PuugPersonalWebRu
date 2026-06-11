@@ -3,7 +3,7 @@
     "general": "Something went wrong.",
     "paymentFailed": "Payment failed because"
   },
-  "resolve": {
+  "resolvers": {
     "reload": "Please reload the page and try again.",
     "callToConfirm": "Please call us to confirm your booking.",
     "safeToRetryPayment": "You can safely try again and will only be charged once."

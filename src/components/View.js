@@ -1,13 +1,15 @@
+'use client'
 import React, { useEffect, useRef, useState } from 'react'
 import { Box, Button, Container, Drawer, FormHelperText, IconButton, FormControl, FormLabel, Slide, Stack, TextField, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
-import { DateTimePicker } from "@mui/lab"
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker'
 import CancelIcon from '@mui/icons-material/Cancel';
 import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever"
-import { useTranslation } from "gatsby-plugin-react-i18next";
+import { useTranslation } from "react-i18next";
 import { DateTime } from 'luxon'
-import firebase from "gatsby-plugin-firebase"
-import { isLoggedIn } from "../firebase"
+import { onAuthStateChanged } from "firebase/auth"
+import { httpsCallable } from "firebase/functions"
+import { isLoggedIn, auth, fns } from "@/lib/firebase"
 
 const Component = (props) => {
   const { t } = useTranslation('_view')
@@ -16,7 +18,7 @@ const Component = (props) => {
   const [isSignedIn,setIsSignedIn] = useState(isLoggedIn)
   const [sessionType,setSessionType] = useState("")
   const [userEmail,setUserEmail] = useState("")
-  const [date,setDate] = useState("")
+  const [date,setDate] = useState(null)
   const [confirmDelete,setConfirmDelete] = useState(false)
   const [confirmRefund,setConfirmRefund] = useState(false)
   const [error,setError] = useState(null)
@@ -31,7 +33,7 @@ const Component = (props) => {
   const handleDelete = async (id) => {
     try {
       setError(false)
-      await firebase.app().functions("europe-central2").httpsCallable('deleteBooking')({id})
+      await httpsCallable(fns, 'deleteBooking')({id})
       setConfirmDelete(false)
       onDelete(id)
     } catch (error) {
@@ -41,7 +43,7 @@ const Component = (props) => {
   const handleUpdate = async (event) => {
     try {
       setError(false)
-      var response = await firebase.app().functions("europe-central2").httpsCallable('updateBooking')({
+      var response = await httpsCallable(fns, 'updateBooking')({
         id: event.id,
         date: date.setZone('Europe/Sofia').toMillis(),
         sessionType,
@@ -58,7 +60,7 @@ const Component = (props) => {
   }
 
   useEffect(() => {
-    const unregisterAuthObserver = firebase.auth().onAuthStateChanged(user => {
+    const unregisterAuthObserver = onAuthStateChanged(auth, user => {
       setIsSignedIn(!!user)
       if(!!user) user.getIdTokenResult().then(token => setPermissions(token.claims))
     })
@@ -67,7 +69,7 @@ const Component = (props) => {
   useEffect(() => {
     setSessionType(event.sessionType || "");
     setUserEmail(event.userEmail || "");
-    setDate(event.date || "");
+    setDate(event.date || null);
   },[event])
 
   return <Drawer {...rest} anchor="top" onClose={handleClose}>
@@ -88,35 +90,35 @@ const Component = (props) => {
               </ToggleButtonGroup>
             </FormControl>
             <FormControl>
-              <DateTimePicker renderInput={props => <TextField {...props} />} label={t('labels.date')} value={date} onChange={v => setDate(v) } />
+              <DateTimePicker label={t('labels.date')} value={date || null} onChange={v => setDate(v)} />
             </FormControl>
           </Stack>
         </fieldset>
         <fieldset>
           {permissions['CAN_EDIT_BOOKING_DETAILS'] && <Stack direction="row" gap={1}>
             <Box ref={actionContainer} css={{overflow:'hidden', position:'relative', flexGrow:1}}>
-              <Slide in={!confirmDelete} 
+              <Slide in={!confirmDelete}
                 direction="left"
                 css={{position:"absolute"}}
                 appear={false}
                 container={actionContainer.current}>
                 <Stack direction="row" gap={1}>
-                  <Button variant="contained" 
-                    size="small" 
+                  <Button variant="contained"
+                    size="small"
                     onClick={() => handleUpdate(event)}>{t('buttons.save')}</Button>
-                  <Button variant="outlined" 
-                    size="small" 
-                    startIcon={<DeleteForeverIcon />} 
+                  <Button variant="outlined"
+                    size="small"
+                    startIcon={<DeleteForeverIcon />}
                     onClick={() => setConfirmDelete(true)}>{t('buttons.delete')}</Button>
                 </Stack>
               </Slide>
-              <Slide in={confirmDelete} 
+              <Slide in={confirmDelete}
                 direction="right"
                 container={actionContainer.current}>
-                <Button variant="contained" 
-                  color="error" 
-                  size="small" 
-                  startIcon={<DeleteForeverIcon/>} 
+                <Button variant="contained"
+                  color="error"
+                  size="small"
+                  startIcon={<DeleteForeverIcon/>}
                   onClick={() => handleDelete(event.id)}>{t('buttons.confirmDelete')}</Button>
               </Slide>
             </Box>

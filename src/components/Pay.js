@@ -1,10 +1,11 @@
+'use client'
 import React, {useState} from "react"
 import { Button, Container, Drawer, FormControl, FormHelperText, IconButton, Input, InputLabel, Stack, Typography } from "@mui/material";
 import CancelIcon from '@mui/icons-material/Cancel';
 import { CardElement, useElements, useStripe } from "@stripe/react-stripe-js";
-import firebase from "gatsby-plugin-firebase"
-import { useTranslation, Trans } from "gatsby-plugin-react-i18next";
-import { getUser } from "../firebase";
+import { httpsCallable } from "firebase/functions"
+import { useTranslation, Trans } from "react-i18next";
+import { getUser, fns } from "@/lib/firebase";
 import Loads from "./Loads"
 
 const CARD_OPTIONS = {
@@ -46,13 +47,13 @@ const Component = (props) => {
       if (confirmation.error) setError(`${t('errors.paymentFailed')} ${confirmation.error.message}. ${t('resolvers.safeToRetryPayment')}`);
       else {
         try {
-          onSuccess({...(await firebase.app().functions("europe-central2").httpsCallable('createBooking')({...booking, 
+          onSuccess({...(await httpsCallable(fns,'createBooking')({...booking,
             userId: getUser().uid,
             paymentReference: confirmation.paymentIntent.id,
             date: booking.date.toMillis()})).data,
             date: booking.date})
-        } catch(err) { 
-          setError(`${t('errors.general')} ${t('resolvers.callToConfirm')}`) 
+        } catch(err) {
+          setError(`${t('errors.general')} ${t('resolvers.callToConfirm')}`)
         }
       }
     } finally {
@@ -83,9 +84,9 @@ const Component = (props) => {
         </fieldset>
         <fieldset>
           <Stack direction="row" justifyContent="stretch">
-            <Button 
-              variant="contained" 
-              disabled={!stripe || disabled} 
+            <Button
+              variant="contained"
+              disabled={!stripe || disabled}
               css={{flexGrow:1}}
               onClick={() => handlePay(intent)}>{t('buttons.pay')}</Button>
             <IconButton variant="text" onClick={onClose}><CancelIcon /></IconButton>

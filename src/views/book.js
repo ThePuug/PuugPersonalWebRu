@@ -1,8 +1,6 @@
+'use client'
 import React, { useCallback, useState, useRef, useEffect } from "react"
-import { graphql } from "gatsby"
 import { DateTime, Duration } from 'luxon'
-import { Location } from '@reach/router'
-import queryString from 'query-string'
 import { styled } from "@mui/material/styles"
 import { Backdrop, Box, Button, ButtonGroup, Card, Container, Drawer, FormControl, FormHelperText, FormLabel, IconButton, LinearProgress, Paper, Stack, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material'
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
@@ -12,30 +10,19 @@ import NavigateNextIcon from '@mui/icons-material/NavigateNext'
 import FullscreenIcon from '@mui/icons-material/Fullscreen'
 import FullscreenExitIcon from '@mui/icons-material/FullscreenExit'
 import PreviewIcon from '@mui/icons-material/Preview'
-import { useTranslation } from "gatsby-plugin-react-i18next"
-import { isLoggedIn, getUser } from "../firebase"
-import firebase from "gatsby-plugin-firebase"
-import SignIn from "../components/SignIn"
-import Nav from "../components/Nav"
-import Footer from "../components/Footer"
-import Pay from "../components/Pay"
-import Loads from "../components/Loads"
-import View from "../components/View"
+import { useTranslation } from "react-i18next"
+import { onAuthStateChanged } from "firebase/auth"
+import { collection, query, where, getDocs } from "firebase/firestore"
+import { httpsCallable } from "firebase/functions"
+import { isBrowser, isLoggedIn, getUser, auth, db, fns } from "@/lib/firebase"
+import SignIn from "@/components/SignIn"
+import Nav from "@/components/Nav"
+import Footer from "@/components/Footer"
+import Pay from "@/components/Pay"
+import Loads from "@/components/Loads"
+import View from "@/components/View"
 
 const slots = [11,15,19,21]
-
-const withLocation = ComponentToWrap => props => (
-  <Location>
-    {({ location, navigate }) => (
-      <ComponentToWrap
-        {...props}
-        location={location}
-        navigate={navigate}
-        search={location.search ? queryString.parse(location.search) : {}}
-      />
-    )}
-  </Location>
-)
 
 const conflicts = (a,b) => {
   const endOf = (e) => e.date.plus(Duration.fromObject({minutes:e.duration}))
@@ -48,10 +35,10 @@ const createSlots = (d,h) => {
   return { date: localTime, duration: 120 }
 }
 
-const Page = ({ search }) => {
+const Page = () => {
   const { t } = useTranslation("book")
   const today = useRef(DateTime.local().startOf('day'))
-  const [sessionType,setSessionType] = useState(search.for || 'individual')
+  const [sessionType,setSessionType] = useState(() => (isBrowser() ? new URLSearchParams(window.location.search).get('for') : null) || 'individual')
   const [timeslot,setTimeslot] = useState(null)
   const [paymentIntent,setPaymentIntent] = useState(null)
   const [monthIndex,setMonthIndex] = useState(today.current.daysInMonth - today.current.day <= 7-((today.current.weekday-1)%6) ? 1 : 0)
@@ -61,11 +48,12 @@ const Page = ({ search }) => {
   const [isBooking,setIsBooking] = useState(false)
   const [isPaying,setIsPaying] = useState(false)
   const [isSigningIn,setIsSigningIn] = useState(false)
-  const [isSignedIn,setIsSignedIn] = useState(isLoggedIn())
+  const [isSignedIn,setIsSignedIn] = useState(false)
   const [viewing,setViewing] = useState(false)
   const [loading,setLoading] = useState(false)
   const [loadingEvents,setLoadingEvents] = useState(false)
   const [error,setError] = useState(null)
+  const [mounted,setMounted] = useState(false)
 
   const first = today.current.startOf('month').plus(Duration.fromObject({months:monthIndex}))
   const start = first.minus(Duration.fromObject({days:first.weekday%7}))
@@ -105,7 +93,7 @@ const Page = ({ search }) => {
       if(isSigningIn) setIsSigningIn(false)
       setLoading(true)
       try {
-        const response = await firebase.app().functions("europe-central2").httpsCallable('stripePaymentIntent')({sessionType:sessionType})
+        const response = await httpsCallable(fns, 'stripePaymentIntent')({sessionType:sessionType})
         setPaymentIntent(response.data)
         setIsPaying(true)
       } catch(err) {
@@ -125,10 +113,10 @@ const Page = ({ search }) => {
     setLoadingEvents(true)
     const first = DateTime.local().startOf('month').plus(Duration.fromObject({months:monthIndex}))
     const start = first.minus(Duration.fromObject({days:first.weekday%7}))
-    firebase.firestore().collection("bookings")
-        .where('date', '>=', start.toJSDate())
-        .where('date', '<', start.plus(Duration.fromObject({days:43})).toJSDate())
-      .get().then(snapshot => {    
+    getDocs(query(collection(db, "bookings"),
+        where('date', '>=', start.toJSDate()),
+        where('date', '<', start.plus(Duration.fromObject({days:43})).toJSDate())))
+      .then(snapshot => {
         clearBookings()
         snapshot.forEach(b => {
           const data = b.data()
@@ -144,18 +132,19 @@ const Page = ({ search }) => {
       .finally(() => setLoadingEvents(false))
   },[addBooking,clearBookings,monthIndex])
   useEffect(() => {
-    const unregisterAuthObserver = firebase.auth().onAuthStateChanged(user => {
+    const unregisterAuthObserver = onAuthStateChanged(auth, user => {
       setIsSignedIn(!!user)
     })
     return () => unregisterAuthObserver();
   }, [])
+  useEffect(() => setMounted(true), [])
 
   return (<>
     <Nav />
     <Container maxWidth="md" css={{padding:0}}>
       <FormControl component="fieldset">
         <FormLabel component="legend" css={{paddingLeft:"1em"}}>{t('labels.selectDate')}</FormLabel>
-          <Loads component={Calendar} loading={loadingEvents} elevation={3} style={{position:focused ? "fixed" : "relative"}}>
+          {mounted && <Loads component={Calendar} loading={loadingEvents} elevation={3} style={{position:focused ? "fixed" : "relative"}}>
             <Navigation>
               <IconButton size="medium" variant="contained" onClick={() => {setMonthIndex(monthIndex-1)}}><NavigateBeforeIcon /></IconButton>
               <Label>{t('date',{val:first.toJSDate(),formatParams:{val:{month:'long'}}})}</Label>
@@ -176,17 +165,17 @@ const Page = ({ search }) => {
                 return <Week key={week}>
                   {Array.from({length:7},(_,k)=>(k)).map(day => {
                     const date = first.minus(Duration.fromObject({days:first.weekday%7})).plus(Duration.fromObject({days:(week)*7+day}))
-                    return (<Day key={day} 
-                      date={date} 
-                      handleSelect={handleSelectDay} 
+                    return (<Day key={day}
+                      date={date}
+                      handleSelect={handleSelectDay}
                       selectable={date > today.current} isSignedIn={isSignedIn}
-                      events={events.filter(e => e.date.ordinal === date.ordinal)} 
+                      events={events.filter(e => e.date.ordinal === date.ordinal)}
                       onView={s => { setViewing(events.find(e => conflicts(e,s))); }} />)
                   })}
                 </Week>
               })}
             </MonthLayout>
-          </Loads>
+          </Loads>}
       </FormControl>
     </Container>
 
@@ -204,9 +193,9 @@ const Page = ({ search }) => {
             <Stack direction="column" gap={2}>
               <FormControl component="fieldset">
                 <FormLabel>{t('labels.consultationType')}</FormLabel>
-                <ToggleButtonGroup exclusive 
-                  value={sessionType} 
-                  onChange={(_,v) => { if(!!v) setSessionType(v) }} 
+                <ToggleButtonGroup exclusive
+                  value={sessionType}
+                  onChange={(_,v) => { if(!!v) setSessionType(v) }}
                   fullWidth
                   orientation="horizontal">
                   <ToggleButton value="individual" color="primary">{t('labels.adult')}</ToggleButton>
@@ -221,9 +210,9 @@ const Page = ({ search }) => {
                     {Array.from({length:4},(_,k)=>createSlots(selectedDay,slots[k])).sort((a,b)=>a.date.hour-b.date.hour)
                       .map((s,i) => {
                         const evts = events.filter(event => event.date.ordinal===selectedDay.ordinal)
-                        return <Slot key={i} 
+                        return <Slot key={i}
                           onSelectTimeslot={t => setTimeslot(t)}
-                          timeslot={s.date} 
+                          timeslot={s.date}
                           active={!!timeslot && conflicts(s,{date: timeslot, duration:120}) ? "true" : undefined}
                           disabled={evts.some(e => e.date<=today.current || conflicts(e,s))}
                           status={evts.some(e => conflicts(e,s))?evts.some(e => isSignedIn && conflicts(e,s) && getUser().uid===e.userId)?"mine":"booked":"free"}
@@ -235,7 +224,7 @@ const Page = ({ search }) => {
                 </FormControl>
                 <Typography variant="h5" color="secondary">{sessionType === "individual" ? 60 : sessionType === 'couple' ? 75 : 40} лв</Typography>
               </Stack>
-            </Stack>            
+            </Stack>
           </fieldset>
           <fieldset>
             <Stack direction="row" justifyContent="space-between">
@@ -260,9 +249,9 @@ const Page = ({ search }) => {
       userEmail: getUser().email,
     }} onClose={() => setIsPaying(false)} onSuccess={onSuccessPay} />
 
-    <View open={!!viewing} 
-      event={viewing} 
-      onClose={handleCloseView} 
+    <View open={!!viewing}
+      event={viewing}
+      onClose={handleCloseView}
       onDelete={handleDelete}
       onUpdate={handleUpdate} />
     <Footer />
@@ -282,10 +271,10 @@ const _Day = (props) => {
       <DayLabel css={{padding:0}}>{date.day}</DayLabel>
       {Array.from({length:4},(_,k)=>createSlots(date,slots[k])).sort((a,b)=>a.date.hour-b.date.hour)
         .map((s,i) => <MonthSlot key={i}>
-          <Slot timeslot={s.date} 
+          <Slot timeslot={s.date}
             disabled={true}
             onSelectTimeslot={t => {}}
-            status={events.some(e => conflicts(e,s))?events.some(e => isSignedIn && conflicts(e,s) && getUser().uid===e.userId)?"mine":"booked":"free"} 
+            status={events.some(e => conflicts(e,s))?events.some(e => isSignedIn && conflicts(e,s) && getUser().uid===e.userId)?"mine":"booked":"free"}
             onView={onView} />
         </MonthSlot>)}
     </Card>
@@ -295,11 +284,11 @@ const _Day = (props) => {
 const _Slot = (props) => {
   const { timeslot, duration, status, onView, active, onSelectTimeslot, disabled, ...rest } = props
   const { t } = useTranslation('book')
-  const [isSignedIn,setIsSignedIn] = useState(isLoggedIn())
+  const [isSignedIn,setIsSignedIn] = useState(false)
   const [permissions,setPermissions] = useState({})
 
   useEffect(() => {
-    const unregisterAuthObserver = firebase.auth().onAuthStateChanged(user => {
+    const unregisterAuthObserver = onAuthStateChanged(auth, user => {
       setIsSignedIn(!!user)
       if(!!user) user.getIdTokenResult().then(token => setPermissions(token.claims))
     })
@@ -313,7 +302,7 @@ const _Slot = (props) => {
       {t('date',{val:timeslot.toJSDate(),formatParams:{val:{ hour:'2-digit', minute:'2-digit'}}})}&nbsp;
     </Button>}
     {!duration && !canView(status) && <Button></Button>}
-    {canView(status) && <Button aria-label="View booking" 
+    {canView(status) && <Button aria-label="View booking"
       onClick={e => { e.preventDefault(); onView({date:timeslot, duration:120}); }}>
         <PreviewIcon />
       </Button>}
@@ -398,7 +387,7 @@ const MonthColLabel = styled(Container)`
 const Day = styled(_Day)`
   text-align:center;
   box-sizing:border-box;
-  display:flex; 
+  display:flex;
   flex-flow:row wrap;
   flex:1 0;
   width:14.2857%;
@@ -416,18 +405,4 @@ const MonthSlot = styled(Box)`
   min-height:32px;
 `
 
-export default withLocation(Page)
-
-export const query = graphql`
-  query ($language: String!) {
-    locales: allLocale(filter: {language: {eq: $language}}) {
-      edges {
-        node {
-          ns
-          data
-          language
-        }
-      }
-    }
-  }
-`;
+export default Page

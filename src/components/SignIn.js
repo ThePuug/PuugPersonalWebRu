@@ -1,47 +1,62 @@
-import React, {useState} from 'react'
-import { Button, Container, Dialog, Typography } from '@mui/material';
-import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
-import { isLoggedIn, getUser, setUser, logout } from "../firebase"
-import { useTranslation } from 'gatsby-plugin-react-i18next';
-import firebase from "gatsby-plugin-firebase"
+'use client'
+import React, {useState, useEffect} from 'react'
+import { Button, Container, Dialog, FormHelperText, Stack, Typography } from '@mui/material';
+import { signInWithPopup, onAuthStateChanged, GoogleAuthProvider, FacebookAuthProvider } from 'firebase/auth'
+import { auth, getUser, setUser, logout } from "@/lib/firebase"
+import { useTranslation } from 'react-i18next';
 import Loads from "./Loads"
 
 const Component = (props) => {
-  const { t,i18n } = useTranslation("_signIn")
+  const { t } = useTranslation("_signIn")
   const { onSuccess, onClose, ...rest } = props
   const [loading,setLoading] = useState(false)
+  const [error,setError] = useState(null)
+  const [isSignedIn,setIsSignedIn] = useState(false)
 
-  const getUiConfig = (auth) => ({
-    signInFlow: 'popup',
-    signInOptions: [{
-      provider: auth.GoogleAuthProvider.PROVIDER_ID,
-      scopes: [ 'https://www.googleapis.com/auth/userinfo.profile' ],
-    },
-    {
-      provider: auth.FacebookAuthProvider.PROVIDER_ID,
-      scopes: [ 'user_birthday', 'public_profile' ],
-    }],
-    callbacks: {
-      signInSuccessWithAuthResult: async (result) => {
-        setUser(result.user)
-        onSuccess()
-      },
-    }
-  })
+  useEffect(() => {
+    const unregisterAuthObserver = onAuthStateChanged(auth, user => setIsSignedIn(!!user));
+    return () => unregisterAuthObserver();
+  }, []);
+
+  const handleSignIn = async (makeProvider) => {
+    setLoading(true); setError(null)
+    try {
+      const result = await signInWithPopup(auth, makeProvider())
+      setUser(result.user)
+      onSuccess()
+    } catch (err) {
+      if (err.code === 'auth/popup-closed-by-user' || err.code === 'auth/cancelled-popup-request') {}
+      else if (err.code === 'auth/account-exists-with-different-credential') setError(t('errors.accountExists'))
+      else setError(t('errors.signInFailed'))
+    } finally { setLoading(false) }
+  }
 
   return (<>
-    {!!firebase.auth && <Loads component={Dialog} loading={loading} onClose={onClose} {...rest} maxWidth="xs" css={{textAlign:`center`}}>
+    <Loads component={Dialog} loading={loading} onClose={onClose} {...rest} maxWidth="xs" css={{textAlign:`center`}}>
       <Container css={{margin:`1em auto`}}>
-        {isLoggedIn() && <>
+        {isSignedIn && <>
           <Typography variant="subtitle2">{t("signedInAs")} {getUser().displayName}</Typography>
-          <Button variant="outlined" color="secondary" onClick={() => { logout(firebase); onClose(); }}>Log out</Button>
+          <Button variant="outlined" color="secondary" onClick={async () => { await logout(); onClose(); }}>Log out</Button>
         </>}
-        {!isLoggedIn() && <>
+        {!isSignedIn && <>
           <Typography variant="subtitle2">{t('signInToProceed')}</Typography>
-          {<StyledFirebaseAuth uiConfig={getUiConfig(firebase.auth)} firebaseAuth={firebase.auth()}/>}
+          <Stack spacing={1} css={{margin:`1em 0`}}>
+            <Button variant="contained" disabled={loading} onClick={() => handleSignIn(() => {
+              const provider = new GoogleAuthProvider()
+              provider.addScope('https://www.googleapis.com/auth/userinfo.profile')
+              return provider
+            })}>{t('signInWithGoogle')}</Button>
+            <Button variant="contained" disabled={loading} onClick={() => handleSignIn(() => {
+              const provider = new FacebookAuthProvider()
+              provider.addScope('user_birthday')
+              provider.addScope('public_profile')
+              return provider
+            })}>{t('signInWithFacebook')}</Button>
+          </Stack>
+          {error && <FormHelperText error>{error}</FormHelperText>}
         </>}
       </Container>
-    </Loads>}
+    </Loads>
   </>)
 }
 

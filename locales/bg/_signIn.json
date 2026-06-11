@@ -1,4 +1,10 @@
 {
   "signedInAs": "Вие сте влезли като:",
-  "signInToProceed": "Моля регистрирайте се преди да продължите."
+  "signInToProceed": "Моля регистрирайте се преди да продължите.",
+  "signInWithGoogle": "Вход с Google",
+  "signInWithFacebook": "Продължи с Facebook",
+  "errors": {
+    "signInFailed": "Неуспешен вход. Моля, опитайте отново.",
+    "accountExists": "Вече съществува акаунт с този имейл — опитайте с другия доставчик."
+  }
 }

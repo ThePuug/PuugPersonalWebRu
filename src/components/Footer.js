@@ -1,7 +1,9 @@
+'use client'
 import React from "react"
 import { Container, Stack, Typography } from "@mui/material"
 import { styled } from "@mui/material/styles"
-import { useTranslation, Link } from "gatsby-plugin-react-i18next"
+import { useTranslation } from "react-i18next"
+import { Link } from "@/components/i18n-provider"
 
 const Component = (props) => {
   const { t } = useTranslation("_footer")

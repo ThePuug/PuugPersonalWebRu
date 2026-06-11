@@ -1,22 +1,25 @@
+'use client'
 import React from "react"
-import { graphql, navigate } from "gatsby"
-import { StaticImage } from "gatsby-plugin-image"
+import { useRouter, usePathname } from "next/navigation"
 import { styled } from "@mui/material/styles"
 import { Button, Card, CardActions, CardContent, CardHeader, CardMedia, Container, IconButton, Paper, Stack, Typography, List, ListItem, ListItemText } from '@mui/material'
 import { Attachment, Facebook, LinkedIn } from "@mui/icons-material"
-import { useTranslation } from "gatsby-plugin-react-i18next"
-import Nav from "../components/Nav"
-import Footer from "../components/Footer"
+import { useTranslation } from "react-i18next"
+import Nav from "@/components/Nav"
+import Footer from "@/components/Footer"
 
 const Page = (props) => {
-  const { t } = useTranslation("index")  
+  const { t } = useTranslation("index")
+  const router = useRouter()
+  const pathname = usePathname() || '/'
+  const navigate = (rel) => router.push(pathname.endsWith('/') ? pathname + rel : pathname + '/' + rel)
   return (<>
     <Nav />
     <Container maxWidth="md">
       <Stack spacing={2}>
         <Stack direction={['column','row']} gap={[2,2]}>
           <Card>
-            <CardMedia><StaticImage src="../images/mind.jpg" alt={t('individualConsultation')} aspectRatio={2} /></CardMedia>
+            <CardMedia><img src="/images/mind.jpg" alt={t('individualConsultation')} style={{ width: '100%', aspectRatio: '2 / 1', objectFit: 'cover', display: 'block' }} /></CardMedia>
             <CardContent css={{textAlign:`center`}}>
               <Typography gutterBottom variant="h5" component="h2">{t('individualConsultation')}</Typography>
               <Typography variant="subtitle1" component="h5"><strong>60 {t('minutes')}</strong></Typography>
@@ -26,7 +29,7 @@ const Page = (props) => {
             </CardActions>
           </Card>
           <Card>
-            <CardMedia><StaticImage src="../images/opening.jpg" alt={t('couplesConsultation')} aspectRatio={2} /></CardMedia>
+            <CardMedia><img src="/images/opening.jpg" alt={t('couplesConsultation')} style={{ width: '100%', aspectRatio: '2 / 1', objectFit: 'cover', display: 'block' }} /></CardMedia>
             <CardContent css={{textAlign:`center`}}>
               <Typography gutterBottom variant="h5" component="h2">{t('couplesConsultation')}</Typography>
               <Typography variant="subtitle1" component="h5"><strong>90 {t('minutes')}</strong></Typography>
@@ -36,7 +39,7 @@ const Page = (props) => {
             </CardActions>
           </Card>
           <Card>
-            <CardMedia><StaticImage src="../images/exploration.jpg" alt={t('childConsultation')} aspectRatio={2} /></CardMedia>
+            <CardMedia><img src="/images/exploration.jpg" alt={t('childConsultation')} style={{ width: '100%', aspectRatio: '2 / 1', objectFit: 'cover', display: 'block' }} /></CardMedia>
             <CardContent css={{textAlign:`center`}}>
               <Typography gutterBottom variant="h5" component="h2">{t('childConsultation')}</Typography>
               <Typography variant="subtitle1" component="h5"><strong>60 {t('minutes')}</strong></Typography>
@@ -51,7 +54,7 @@ const Page = (props) => {
               <CardHeader title={t('profile.name')} />
               <CardHeader title={t('profile.title')} />
               <CardMedia css={{textAlign:`center`}}>
-                <StaticImage src="../images/profile.jpg" alt="about me" aspectRatio={0.667} layout="constrained" />
+                <img src="/images/profile.jpg" alt="about me" style={{ width: '100%', aspectRatio: '0.667', objectFit: 'cover', display: 'block' }} />
               </CardMedia>
               <CardActions css={{justifyContent:`center`}}>
                 <IconButton href="https://www.facebook.com/artudoma" target="_blank"><Facebook fontSize="large" /></IconButton>
@@ -96,17 +99,3 @@ const Profile = styled(Card)`
 `
 
 export default Page
-
-export const query = graphql`
-  query ($language: String!) {
-    locales: allLocale(filter: {language: {eq: $language}}) {
-      edges {
-        node {
-          ns
-          data
-          language
-        }
-      }
-    }
-  }
-`;
