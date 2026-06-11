@@ -17,7 +17,7 @@ const Page = (props) => {
     <Nav />
     <Container maxWidth="md">
       <Stack spacing={2}>
-        <Stack direction={['column','row']} gap={[2,2]}>
+        <Stack direction={['column','row']} sx={{gap:2}}>
           <Card>
             <CardMedia><img src="/images/mind.jpg" alt={t('individualConsultation')} style={{ width: '100%', aspectRatio: '2 / 1', objectFit: 'cover', display: 'block' }} /></CardMedia>
             <CardContent css={{textAlign:`center`}}>
@@ -69,7 +69,7 @@ const Page = (props) => {
           <Typography variant="h6" gutterBottom>{t('headings.aboutServices')}</Typography>
           {t('content.aboutServices',{returnObjects:true}).map((p,i) => <Typography key={i} variant="body1" gutterBottom>{p}</Typography>)}
           <Typography variant="h6">{t('headings.onlineServicesOffered')}</Typography>
-          <Stack direction={['column','row']} gap={[2,2]} css={{"> *": { flex:`1 0` }}}>
+          <Stack direction={['column','row']} sx={{gap:2}} css={{"> *": { flex:`1 0` }}}>
             {t('content.onlineServicesOffered',{returnObjects:true}).map((p,i) => <Card key={i}><CardContent><Typography variant="body1">{p}</Typography></CardContent></Card>)}
           </Stack>
         </Paper>

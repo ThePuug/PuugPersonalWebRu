@@ -183,14 +183,14 @@ const Page = () => {
 
     <Loads component={Drawer} loading={loading} open={isBooking} onClose={handleCloseBookingDialog} anchor="top">
       <Container maxWidth="xs" css={{margin:`1em auto`, textAlign:`center`}}>
-        <Stack direction="column" gap={2}>
+        <Stack direction="column" sx={{gap:2}}>
           <div css={{position:`relative`, button: { position:`absolute`, left:`0`, top:`50%`, marginTop:`-1.5rem`, "&:last-child": { right:`0`, left:`unset` }}}}>
             <IconButton size="medium" aria-label="previous" onClick={() => handleChangeDay(-1)}><ArrowBackIcon /></IconButton>
             <Typography gutterBottom variant="h5">{t('date',{val:selectedDay.toJSDate(),formatParams:{val:{day:"numeric",month:"long",year:"numeric"}}})}</Typography>
             <IconButton size="medium" variant="outlined" aria-label="next" onClick={() => handleChangeDay(1)}><ArrowForwardIcon /></IconButton>
           </div>
           <fieldset>
-            <Stack direction="column" gap={2}>
+            <Stack direction="column" sx={{gap:2}}>
               <FormControl component="fieldset">
                 <FormLabel>{t('labels.consultationType')}</FormLabel>
                 <ToggleButtonGroup exclusive
@@ -203,7 +203,7 @@ const Page = () => {
                   <ToggleButton value="child" color="primary">{t('labels.child')}</ToggleButton>
                 </ToggleButtonGroup>
               </FormControl>
-              <Stack direction="row" justifyContent="space-around" alignItems="center">
+              <Stack direction="row" sx={{justifyContent:"space-around", alignItems:"center"}}>
                 <FormControl component="fieldset" css={{marginBottom:`1rem`}}>
                   <FormLabel>{t('labels.selectTime')}</FormLabel>
                   <Stack direction="column" color="primary">
@@ -227,7 +227,7 @@ const Page = () => {
             </Stack>
           </fieldset>
           <fieldset>
-            <Stack direction="row" justifyContent="space-between">
+            <Stack direction="row" sx={{justifyContent:"space-between"}}>
               <Button variant="contained" disabled={!timeslot || loading} onClick={handleBookNow}>{t('buttons.bookNow')}</Button>
               <Button variant="text" onClick={handleCloseBookingDialog}>{t('buttons.close')}</Button>
             </Stack>

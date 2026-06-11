@@ -22,8 +22,8 @@ const Component = () => {
 
   return <>
     <Container maxWidth="md">
-      <Stack direction='row' justifyContent="space-between" alignItems="center" spacing={1}>
-        <Stack direction='row' alignItems="center" spacing={1}>
+      <Stack direction='row' sx={{justifyContent:"space-between", alignItems:"center"}} spacing={1}>
+        <Stack direction='row' sx={{alignItems:"center"}} spacing={1}>
           <Link to="/"><img src="/images/logo.png" width={75} alt="" style={{display:'block'}} /></Link>
           <LangSwitch>
             <Button to={originalPath} language="bg" component={Link} data-selected={i18n.language === 'bg'}>БГ</Button>

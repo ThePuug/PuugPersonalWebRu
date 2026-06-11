@@ -10,7 +10,7 @@ const Component = (props) => {
   return <>
     <Footer maxWidth={false}>
       <Container maxWidth="md">
-        <Stack direction='row' justifyContent='space-between' alignItems='center' spacing={1}>
+        <Stack direction='row' sx={{justifyContent:'space-between', alignItems:'center'}} spacing={1}>
           <Link to="/">{t('linkHome')}</Link>
           <Typography variant="body1">{t('companyName')} ©&nbsp;{new Date().getFullYear()}</Typography>
           <Link to="/policies">{t('linkPolicies')}</Link>

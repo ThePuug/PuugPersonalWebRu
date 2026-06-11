@@ -75,9 +75,9 @@ const Component = (props) => {
   return <Drawer {...rest} anchor="top" onClose={handleClose}>
     <Container maxWidth="sm" css={{margin:`1em auto`}}>
       <Typography variant="title" component="h3">{t('headings.eventDetails')}</Typography>
-      <Stack direction="column" gap={2}>
+      <Stack direction="column" sx={{gap:2}}>
         <fieldset disabled={!permissions['CAN_EDIT_BOOKING_DETAILS']}>
-          <Stack direction="column" gap={2} marginTop={2}>
+          <Stack direction="column" sx={{gap:2, marginTop:2}}>
             <FormControl component="fieldset" fullWidth={true}>
               <TextField required label={t("labels.email")} value={userEmail} onChange={e => setUserEmail(e.target.value) } />
             </FormControl>
@@ -95,14 +95,14 @@ const Component = (props) => {
           </Stack>
         </fieldset>
         <fieldset>
-          {permissions['CAN_EDIT_BOOKING_DETAILS'] && <Stack direction="row" gap={1}>
+          {permissions['CAN_EDIT_BOOKING_DETAILS'] && <Stack direction="row" sx={{gap:1}}>
             <Box ref={actionContainer} css={{overflow:'hidden', position:'relative', flexGrow:1}}>
               <Slide in={!confirmDelete}
                 direction="left"
                 css={{position:"absolute"}}
                 appear={false}
                 container={actionContainer.current}>
-                <Stack direction="row" gap={1}>
+                <Stack direction="row" sx={{gap:1}}>
                   <Button variant="contained"
                     size="small"
                     onClick={() => handleUpdate(event)}>{t('buttons.save')}</Button>
@@ -127,7 +127,7 @@ const Component = (props) => {
               {confirmDelete && <IconButton size="small" onClick={handleCancelDelete}><CancelIcon /></IconButton>}
             </Box>
           </Stack>}
-          {!permissions['CAN_EDIT_BOOKING_DETAILS'] && <Stack direction="row" justifyContent="space-between">
+          {!permissions['CAN_EDIT_BOOKING_DETAILS'] && <Stack direction="row" sx={{justifyContent:"space-between"}}>
             {!confirmRefund && <>
               {/*<Button startIcon={<CurrencyExchangeIcon/>} variant="outlined" onClick={e => setConfirmRefund(true)}>Request refund</Button>*/}
               <Box></Box>

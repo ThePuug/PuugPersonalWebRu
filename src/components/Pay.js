@@ -63,9 +63,9 @@ const Component = (props) => {
 
   return <Loads component={Drawer} {...rest} loading={loading} anchor="top">
     <Container maxWidth="sm" css={{margin:`1em auto`}}>
-      <Stack gap={2}>
+      <Stack sx={{gap:2}}>
           <fieldset>
-          <Stack direction="column" gap={2}>
+          <Stack direction="column" sx={{gap:2}}>
             <FormControl margin="normal">
               <InputLabel>{t('labels.emailAddress')}</InputLabel>
               <Input readOnly value={getUser().email}></Input>
@@ -83,7 +83,7 @@ const Component = (props) => {
           </Stack>
         </fieldset>
         <fieldset>
-          <Stack direction="row" justifyContent="stretch">
+          <Stack direction="row" sx={{justifyContent:"stretch"}}>
             <Button
               variant="contained"
               disabled={!stripe || disabled}
