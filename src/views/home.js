@@ -12,7 +12,13 @@ const Page = (props) => {
   const { t } = useTranslation("index")
   const router = useRouter()
   const pathname = usePathname() || '/'
-  const navigate = (rel) => router.push(pathname.endsWith('/') ? pathname + rel : pathname + '/' + rel)
+  // push the canonical trailingSlash form (slash before the query) — otherwise the
+  // router normalizes against its cache on repeat visits and drops the new search params
+  const navigate = (rel) => {
+    const [page, query] = rel.split('?')
+    const base = pathname.endsWith('/') ? pathname : pathname + '/'
+    router.push(`${base}${page}/${query ? '?' + query : ''}`)
+  }
   return (<>
     <Nav />
     <Container maxWidth="md">
