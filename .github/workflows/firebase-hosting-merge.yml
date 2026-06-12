@@ -20,7 +20,11 @@ jobs:
           NEXT_PUBLIC_FIREBASE_API_KEY: '${{ secrets.GATSBY_FIREBASE_API_KEY }}'
           NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: 'puugpersonalwebru.web.app'
           NEXT_PUBLIC_FIREBASE_PROJECT_ID: 'puugpersonalwebru'
-          NEXT_PUBLIC_STRIPE_PUBLIC_KEY: '${{ secrets.GATSBY_STRIPE_PUBLIC_KEY }}'
+          # Stripe publishable keys are public by design (they ship in the JS bundle).
+          # Hardcoded so the key visibly matches the account behind functions.config().stripe.privatekey;
+          # the GATSBY_STRIPE_PUBLIC_KEY repo secret previously held a different account's key, which
+          # broke confirmCardPayment (cross-account client_secret) in production.
+          NEXT_PUBLIC_STRIPE_PUBLIC_KEY: 'pk_test_51JC43BFkjIptzemw0PYYae6SUI7Z49QtmlXMTzbcIrZ0iIQUVmycn6MhHR5uJ6AtXbzCnwuYJrKCtCQjkWDbFgxz00eUVN954d'
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'

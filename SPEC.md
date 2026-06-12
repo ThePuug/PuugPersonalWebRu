@@ -108,13 +108,16 @@ REPLACE firebase-hosting-merge.yml and ADD firebase-hosting-branch-preview.yml, 
 ../PuugPersonalWebLct (checkout@v5, setup-node@v6 node 24 cache npm, `npm ci && npm run build`,
 FirebaseExtended/action-hosting-deploy@v0). Differences from Lct:
 - projectId: `puugpersonalwebru`; service account secret `FIREBASE_SERVICE_ACCOUNT_PUUGPERSONALWEBRU`.
-- Build env (REUSE existing GitHub secret names — no new secrets):
+- Build env:
 ```yaml
 env:
   NEXT_PUBLIC_FIREBASE_API_KEY: '${{ secrets.GATSBY_FIREBASE_API_KEY }}'
   NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: 'puugpersonalwebru.web.app'
   NEXT_PUBLIC_FIREBASE_PROJECT_ID: 'puugpersonalwebru'
-  NEXT_PUBLIC_STRIPE_PUBLIC_KEY: '${{ secrets.GATSBY_STRIPE_PUBLIC_KEY }}'
+  NEXT_PUBLIC_STRIPE_PUBLIC_KEY: 'pk_test_51JC43B…'   # hardcoded — publishable keys are public;
+  # the GATSBY_STRIPE_PUBLIC_KEY secret held a DIFFERENT Stripe account's key (pk_test_51KYXXP…),
+  # which broke confirmCardPayment in production (cross-account client_secret). The backend's
+  # functions.config().stripe.privatekey is on the 51JC43B account.
 ```
 (AUTH_DOMAIN hardcoded value preserved verbatim from old workflow — auth popups depend on it.)
 - Branch-preview: trigger on push to branches-ignore main; slugified `channelId` step copied from Lct;
