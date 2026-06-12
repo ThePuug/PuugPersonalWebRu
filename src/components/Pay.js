@@ -1,10 +1,11 @@
+'use client'
 import React, {useState} from "react"
 import { Button, Container, Drawer, FormControl, FormHelperText, IconButton, Input, InputLabel, Stack, Typography } from "@mui/material";
 import CancelIcon from '@mui/icons-material/Cancel';
 import { CardElement, useElements, useStripe } from "@stripe/react-stripe-js";
-import firebase from "gatsby-plugin-firebase"
-import { useTranslation, Trans } from "gatsby-plugin-react-i18next";
-import { getUser } from "../firebase";
+import { httpsCallable } from "firebase/functions"
+import { useTranslation, Trans } from "react-i18next";
+import { getUser, fns } from "@/lib/firebase";
 import Loads from "./Loads"
 
 const CARD_OPTIONS = {
@@ -46,13 +47,13 @@ const Component = (props) => {
       if (confirmation.error) setError(`${t('errors.paymentFailed')} ${confirmation.error.message}. ${t('resolvers.safeToRetryPayment')}`);
       else {
         try {
-          onSuccess({...(await firebase.app().functions("europe-central2").httpsCallable('createBooking')({...booking, 
+          onSuccess({...(await httpsCallable(fns,'createBooking')({...booking,
             userId: getUser().uid,
             paymentReference: confirmation.paymentIntent.id,
             date: booking.date.toMillis()})).data,
             date: booking.date})
-        } catch(err) { 
-          setError(`${t('errors.general')} ${t('resolvers.callToConfirm')}`) 
+        } catch(err) {
+          setError(`${t('errors.general')} ${t('resolvers.callToConfirm')}`)
         }
       }
     } finally {
@@ -62,9 +63,9 @@ const Component = (props) => {
 
   return <Loads component={Drawer} {...rest} loading={loading} anchor="top">
     <Container maxWidth="sm" css={{margin:`1em auto`}}>
-      <Stack gap={2}>
+      <Stack sx={{gap:2}}>
           <fieldset>
-          <Stack direction="column" gap={2}>
+          <Stack direction="column" sx={{gap:2}}>
             <FormControl margin="normal">
               <InputLabel>{t('labels.emailAddress')}</InputLabel>
               <Input readOnly value={getUser().email}></Input>
@@ -78,14 +79,14 @@ const Component = (props) => {
                 {!!error && <span>{error}</span>}
               </FormHelperText>
             </FormControl>
-            <Typography variant="subtitle">{t('labels.amount')} {booking.sessionType === "individual" ? 60 : booking.sessionType === 'couple' ? 75 : 40} лв</Typography>
+            <Typography variant="subtitle">{t('labels.amount')} {booking.sessionType === "individual" ? 30 : booking.sessionType === 'couple' ? 40 : 20} €</Typography>
           </Stack>
         </fieldset>
         <fieldset>
-          <Stack direction="row" justifyContent="stretch">
-            <Button 
-              variant="contained" 
-              disabled={!stripe || disabled} 
+          <Stack direction="row" sx={{justifyContent:"stretch"}}>
+            <Button
+              variant="contained"
+              disabled={!stripe || disabled}
               css={{flexGrow:1}}
               onClick={() => handlePay(intent)}>{t('buttons.pay')}</Button>
             <IconButton variant="text" onClick={onClose}><CancelIcon /></IconButton>

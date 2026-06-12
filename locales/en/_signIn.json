@@ -1,4 +1,10 @@
 {
   "signedInAs": "You are signed in as:",
-  "signInToProceed": "Please sign in before you proceed."
+  "signInToProceed": "Please sign in before you proceed.",
+  "signInWithGoogle": "Sign in with Google",
+  "signInWithFacebook": "Continue with Facebook",
+  "errors": {
+    "signInFailed": "Sign-in failed. Please try again.",
+    "accountExists": "An account already exists with this email — try the other sign-in provider."
+  }
 }

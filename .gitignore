@@ -4,3 +4,5 @@ node_modules/
 public
 .env*
 *.log
+.next/
+out/
