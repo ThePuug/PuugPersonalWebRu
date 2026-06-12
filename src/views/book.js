@@ -1,5 +1,6 @@
 'use client'
-import React, { useCallback, useState, useRef, useEffect } from "react"
+import React, { Suspense, useCallback, useState, useRef, useEffect } from "react"
+import { useSearchParams } from "next/navigation"
 import { DateTime, Duration } from 'luxon'
 import { styled } from "@mui/material/styles"
 import { Backdrop, Box, Button, ButtonGroup, Card, Container, Drawer, FormControl, FormHelperText, FormLabel, IconButton, LinearProgress, Paper, Stack, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material'
@@ -33,6 +34,16 @@ const createSlots = (d,h) => {
   var sofiaTime = d.plus(Duration.fromObject({hours:d.hour-d.setZone('Europe/Sofia').hour+h}))
   var localTime = sofiaTime.toLocal().plus(Duration.fromObject({days:d.ordinal-sofiaTime.ordinal}))
   return { date: localTime, duration: 120 }
+}
+
+// useSearchParams suspends the whole page during static export, so it lives in
+// this null-rendering child behind its own Suspense boundary. Unlike a one-time
+// window.location read, it stays correct across client-side navigations, where
+// the page renders before the browser URL updates.
+const SessionTypeFromQuery = ({ onChange }) => {
+  const forParam = useSearchParams().get('for')
+  useEffect(() => { if (forParam) onChange(forParam) },[forParam, onChange])
+  return null
 }
 
 const Page = () => {
@@ -140,6 +151,7 @@ const Page = () => {
   useEffect(() => setMounted(true), [])
 
   return (<>
+    <Suspense fallback={null}><SessionTypeFromQuery onChange={setSessionType} /></Suspense>
     <Nav />
     <Container maxWidth="md" css={{padding:0}}>
       <FormControl component="fieldset">
