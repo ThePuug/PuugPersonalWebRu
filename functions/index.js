@@ -21,12 +21,13 @@ exports.stripePaymentIntent = functions.region("europe-central2").https.onCall(a
   if(!['individual','couple','child'].some(it => it === data.sessionType))
     throw new functions.https.HttpsError("invalid-argument","invalid product code")
   
-  const amount = data.sessionType === 'individual' ? 6000 : data.sessionType === 'couple' ? 7500 : 4000
+  // Stripe dropped BGN after Bulgaria's euro changeover; amounts are EUR cents.
+  const amount = data.sessionType === 'individual' ? 3000 : data.sessionType === 'couple' ? 4000 : 2000
   const user = await admin.firestore().collection("users").doc(context.auth.uid).get()
   const intent = await stripe.paymentIntents.create({
     customer: user.data().stripeRef,
     amount: amount,
-    currency: "bgn"
+    currency: "eur"
   })
   return intent.client_secret
 })
