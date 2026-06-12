@@ -1,6 +1,6 @@
 'use client'
 import React from "react"
-import { useRouter, usePathname } from "next/navigation"
+import { usePathname } from "next/navigation"
 import { styled } from "@mui/material/styles"
 import { Button, Card, CardActions, CardContent, CardHeader, CardMedia, Container, IconButton, Paper, Stack, Typography, List, ListItem, ListItemText } from '@mui/material'
 import { Attachment, Facebook, LinkedIn } from "@mui/icons-material"
@@ -10,14 +10,15 @@ import Footer from "@/components/Footer"
 
 const Page = (props) => {
   const { t } = useTranslation("index")
-  const router = useRouter()
   const pathname = usePathname() || '/'
-  // push the canonical trailingSlash form (slash before the query) — otherwise the
-  // router normalizes against its cache on repeat visits and drops the new search params
+  // Full-page navigation, not router.push: on repeat soft-navs to /book the client
+  // router serves the cached route entry and restores its canonical URL, silently
+  // dropping the changed ?for= param (staleTimes.static has a 30s floor, so the
+  // cache window can't be configured away). The site is static, so a hard load is cheap.
   const navigate = (rel) => {
     const [page, query] = rel.split('?')
     const base = pathname.endsWith('/') ? pathname : pathname + '/'
-    router.push(`${base}${page}/${query ? '?' + query : ''}`)
+    window.location.assign(`${base}${page}/${query ? '?' + query : ''}`)
   }
   return (<>
     <Nav />
