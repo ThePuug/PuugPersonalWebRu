@@ -222,7 +222,7 @@ const Page = () => {
                     })}
                   </Stack>
                 </FormControl>
-                <Typography variant="h5" color="secondary">{sessionType === "individual" ? 30 : sessionType === 'couple' ? 40 : 20} €</Typography>
+                <Typography variant="h5" color="secondary">{sessionType === "individual" ? 40 : sessionType === 'couple' ? 60 : 80} €</Typography>
               </Stack>
             </Stack>
           </fieldset>
