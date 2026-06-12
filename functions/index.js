@@ -22,7 +22,7 @@ exports.stripePaymentIntent = functions.region("europe-central2").https.onCall(a
     throw new functions.https.HttpsError("invalid-argument","invalid product code")
   
   // Stripe dropped BGN after Bulgaria's euro changeover; amounts are EUR cents.
-  const amount = data.sessionType === 'individual' ? 4000 : data.sessionType === 'couple' ? 6000 : 8000
+  const amount = data.sessionType === 'individual' ? 6000 : data.sessionType === 'couple' ? 8000 : 4000
   const user = await admin.firestore().collection("users").doc(context.auth.uid).get()
   const intent = await stripe.paymentIntents.create({
     customer: user.data().stripeRef,
