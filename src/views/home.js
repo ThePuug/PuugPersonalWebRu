@@ -60,7 +60,7 @@ const Page = (props) => {
             <Profile elevation={4}>
               <CardHeader title={t('profile.name')} />
               <CardHeader disableTypography css={{paddingTop:0}} title={t('profile.title',{returnObjects:true}).map((line,i) =>
-                <Typography key={i} variant="h6">{line}</Typography>)} />
+                <Typography key={i} variant="subtitle1">{line}</Typography>)} />
               <CardMedia css={{textAlign:`center`}}>
                 <img src="/images/profile.jpg" alt="about me" style={{ width: '100%', aspectRatio: '0.667', objectFit: 'cover', display: 'block' }} />
               </CardMedia>
