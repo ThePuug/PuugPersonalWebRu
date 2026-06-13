@@ -9,9 +9,9 @@ const Page = (props) => {
   const { t } = useTranslation("policies")
   return (<>
     <Nav />
-    <Container maxWidth="md">
-      <Stack spacing={2}>
-        <Paper css={{padding:`1rem`}}>
+    <Container maxWidth="md" sx={{ px: { xs: 2, sm: 3 }, py: { xs: 3, md: 5 } }}>
+      <Stack spacing={3}>
+        <Paper elevation={0} sx={{ p: { xs: 2, md: 3 }, border: '1px solid rgba(91,75,196,0.16)', borderRadius: 3, bgcolor: 'background.paper' }}>
           <Typography variant="h4">{t('privacyPolicy')}</Typography>
           <Typography variant="body1"><em>Last updated: June 19, 2022</em></Typography>
           <Typography variant="body1" paragraph>We value your privacy, and with this page, we want to clearly communicate what data we collect and how we use it and also inform you of your rights to privacy while using artudoma.com site.</Typography>
@@ -60,8 +60,8 @@ const Page = (props) => {
           <Typography variant="h5">Contact Us</Typography>
           <Typography variant="body1" paragraph>If you have any questions about this Privacy Policy, You can contact us by email at admin@artudoma.com</Typography>
         </Paper>
-        <Paper css={{padding:`1rem`}}>
-          <Typography variant="title" component="h4">{t('termsOfService')}</Typography>
+        <Paper elevation={0} sx={{ p: { xs: 2, md: 3 }, border: '1px solid rgba(91,75,196,0.16)', borderRadius: 3, bgcolor: 'background.paper' }}>
+          <Typography variant="h4">{t('termsOfService')}</Typography>
           <Typography variant="body1">We protect your data to the best of our ability, and you accept the risks associated with using the site.</Typography>
         </Paper>
       </Stack>

@@ -1,4 +1,10 @@
+import { Playfair_Display, Lora } from 'next/font/google'
 import Providers from '@/components/providers'
+
+// Self-hosted at build time with the Cyrillic subset so Bulgarian renders without
+// a runtime request or FOUC. Exposed as CSS variables consumed by theme.js.
+const playfair = Playfair_Display({ subsets: ['latin', 'cyrillic'], display: 'swap', variable: '--font-playfair' })
+const lora = Lora({ subsets: ['latin', 'cyrillic'], style: ['normal', 'italic'], display: 'swap', variable: '--font-lora' })
 
 export const sharedMetadata = {
   title: 'Regain Us',
@@ -12,9 +18,8 @@ export const sharedViewport = { width: 'device-width', initialScale: 1, minimumS
 
 export default function Shell({ locale, children }) {
   return (
-    <html lang={locale}>
+    <html lang={locale} className={`${playfair.variable} ${lora.variable}`}>
       <body>
-        <link href="https://fonts.googleapis.com/css?family=Roboto:400,500,700&display=swap" rel="stylesheet" />
         <Providers locale={locale}>{children}</Providers>
       </body>
     </html>

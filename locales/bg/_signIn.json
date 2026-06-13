@@ -3,6 +3,8 @@
   "signInToProceed": "Моля регистрирайте се преди да продължите.",
   "signInWithGoogle": "Вход с Google",
   "signInWithFacebook": "Продължи с Facebook",
+  "openSignIn": "Вход",
+  "openAccount": "Акаунт",
   "errors": {
     "signInFailed": "Неуспешен вход. Моля, опитайте отново.",
     "accountExists": "Вече съществува акаунт с този имейл — опитайте с другия доставчик."

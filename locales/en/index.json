@@ -3,12 +3,14 @@
   "couplesConsultation": "Couples session",
   "childConsultation": "Child session",
   "minutes": "minutes",
+  "notFound": { "title": "Page not found", "back": "Back home" },
   "buttons": {
     "reserve": "Book now",
     "abstract": "Abstract"
   },
   "profile": {
     "name": "Rosanna Mihailova Chizhova-Sturgeon, Ph.D.",
+    "eyebrow": "Therapy · Counselling · Art Therapy",
     "title": [
       "Family Consultant, EMDR & Art Therapist"
     ]
