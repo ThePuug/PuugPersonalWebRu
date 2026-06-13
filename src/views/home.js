@@ -70,7 +70,7 @@ const Page = (props) => {
       <Stack spacing={{ xs: 5, md: 8 }} sx={{ py: { xs: 3, md: 5 } }}>
 
         {/* booking services — three paintings hung as a row, stacked on mobile */}
-        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={{ xs: 2.5, md: 3 }} sx={{ '& > *': { flex: '1 1 0' } }}>
+        <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(3, 1fr)' }, gap: { xs: 2.5, md: 3 } }}>
           {services.map((s, i) => (
             <ServiceCard key={s.for} sx={reveal(i * 90)}>
               <Box sx={{ p: 1, pb: 0 }}>
@@ -90,7 +90,7 @@ const Page = (props) => {
               </CardActions>
             </ServiceCard>
           ))}
-        </Stack>
+        </Box>
 
         {/* hero / profile — stacked on mobile, asymmetric two-column on md+ */}
         <Box component="section">
@@ -145,7 +145,7 @@ const Page = (props) => {
               <Typography key={i} paragraph sx={{ lineHeight: 1.75 }}>{p}</Typography>)}
           </Box>
           <Typography variant="h6" component="h3" sx={{ mt: 4, mb: 2 }}>{t('headings.onlineServicesOffered')}</Typography>
-          <Stack direction={{ xs: 'column', md: 'row' }} spacing={2.5} sx={{ '& > *': { flex: '1 1 0' } }}>
+          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(3, 1fr)' }, gap: 2.5 }}>
             {t('content.onlineServicesOffered', { returnObjects: true }).map((p, i) => (
               <Card key={i} sx={{ p: 1, ...reveal(i * 80) }}>
                 <CardContent>
@@ -154,7 +154,7 @@ const Page = (props) => {
                 </CardContent>
               </Card>
             ))}
-          </Stack>
+          </Box>
         </Box>
 
         <CoralDivider />
