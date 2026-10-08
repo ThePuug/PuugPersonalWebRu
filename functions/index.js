@@ -1,9 +1,11 @@
 const functions = require("firebase-functions/v1");
 const { defineSecret } = require("firebase-functions/params");
-const admin = require("firebase-admin");
+const { initializeApp } = require("firebase-admin/app");
+const { getFirestore } = require("firebase-admin/firestore");
 const Stripe = require("stripe");
 
-admin.initializeApp();
+initializeApp();
+const db = getFirestore();
 
 const STRIPE_SECRET_KEY = defineSecret("STRIPE_SECRET_KEY");
 // Secret values only resolve at runtime, so the client is built on first use.
@@ -24,8 +26,8 @@ const MAX_DURATION = Math.max(...Object.values(SESSION_TYPES).map(s => s.duratio
 // `bookings` hold client details and are readable only by their owner or staff;
 // `slots` mirror each active booking with just its time so the public calendar
 // can show what's taken. Both share the same document id.
-const bookings = () => admin.firestore().collection("bookings")
-const slots = () => admin.firestore().collection("slots")
+const bookings = () => db.collection("bookings")
+const slots = () => db.collection("slots")
 const minutes = m => m * 60 * 1000
 
 const requireSessionType = sessionType => {
@@ -60,7 +62,7 @@ exports.stripeCreateCustomer = region.auth.user().onCreate(async (user) => {
       uid: user.uid
     }
   })
-  await admin.firestore().collection("users").doc(user.uid).set({stripeRef:customer.id})
+  await db.collection("users").doc(user.uid).set({stripeRef:customer.id})
 })
 
 exports.stripePaymentIntent = region.https.onCall(async (data,context) => {
@@ -74,7 +76,7 @@ exports.stripePaymentIntent = region.https.onCall(async (data,context) => {
   if(await isSlotTaken(date, duration))
     throw new HttpsError("already-exists","This time is already booked")
 
-  const user = await admin.firestore().collection("users").doc(context.auth.uid).get()
+  const user = await db.collection("users").doc(context.auth.uid).get()
   const intent = await getStripe().paymentIntents.create({
     customer: user.data().stripeRef,
     amount: amount,
@@ -94,7 +96,7 @@ exports.createBooking = region.https.onCall(async (data,context) => {
   if(intent.status !== "succeeded")
     throw new HttpsError("not-found","the payment reference is not valid")
 
-  const user = await admin.firestore().collection("users").doc(context.auth.uid).get()
+  const user = await db.collection("users").doc(context.auth.uid).get()
   if(intent.customer !== user.data()?.stripeRef)
     throw new HttpsError("permission-denied","the payment does not belong to this user")
 
@@ -119,7 +121,7 @@ exports.createBooking = region.https.onCall(async (data,context) => {
     paymentReference: data.paymentReference,
   }
   const ref = bookings().doc()
-  const outcome = await admin.firestore().runTransaction(async tx => {
+  const outcome = await db.runTransaction(async tx => {
     const existing = await tx.get(bookings().where("paymentReference","==",data.paymentReference).limit(1))
     if(!existing.empty) return { existing: existing.docs[0] }
     if(await isSlotTaken(date, duration, tx)) return { taken: true }
@@ -156,7 +158,7 @@ exports.deleteBooking = region.https.onCall(async (data,context) => {
   requireStaff(context)
 
   // Bookings are kept for the payment record; clearing the date removes them from the calendar.
-  const batch = admin.firestore().batch()
+  const batch = db.batch()
   batch.update(bookings().doc(data.id), {date: null})
   batch.delete(slots().doc(data.id))
   await batch.commit()
@@ -170,7 +172,7 @@ exports.updateBooking = region.https.onCall(async (data,context) => {
   if(typeof data.userEmail !== "string") throw new HttpsError("invalid-argument","invalid email")
 
   const doc = bookings().doc(data.id)
-  const batch = admin.firestore().batch()
+  const batch = db.batch()
   batch.update(doc, {
     sessionType: data.sessionType,
     duration,
