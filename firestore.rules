@@ -1,12 +1,21 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    
+
     match /users/{uid} {
       allow read,write,update,delete: if false
     }
 
+    // Client details: only the booking's owner, or staff with the claim.
+    // All writes go through Cloud Functions.
     match /bookings/{booking} {
+      allow read: if request.auth != null
+        && (resource.data.userId == request.auth.uid || request.auth.token.CAN_VIEW_ALL_BOOKINGS == true)
+      allow update,write,delete: if false
+    }
+
+    // Times only, so the public calendar can show what's taken.
+    match /slots/{slot} {
       allow read: if true
       allow update,write,delete: if false
     }

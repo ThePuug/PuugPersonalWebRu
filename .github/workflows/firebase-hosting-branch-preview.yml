@@ -3,11 +3,9 @@ name: Deploy branch preview to Firebase Hosting
   push:
     branches-ignore:
       - main
-# action-hosting-deploy@v0 still declares node20; GitHub forces JS actions onto
-# Node 24 starting 2026-06-16. Opting in early so the breakage (if any) happens
-# on our schedule. Remove once the action ships a node24 release.
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+permissions:
+  contents: read
+  id-token: write
 jobs:
   build_and_preview:
     runs-on: ubuntu-latest
@@ -19,18 +17,18 @@ jobs:
           cache: npm
       - run: npm ci && npm run build
         env:
-          NEXT_PUBLIC_FIREBASE_API_KEY: '${{ secrets.GATSBY_FIREBASE_API_KEY }}'
-          NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: 'puugpersonalwebru.web.app'
-          NEXT_PUBLIC_FIREBASE_PROJECT_ID: 'puugpersonalwebru'
-          NEXT_PUBLIC_STRIPE_PUBLIC_KEY: '${{ secrets.GATSBY_STRIPE_PUBLIC_KEY }}'
-      # Firebase channel IDs only allow letters, numbers and hyphens
-      - id: channel
-        run: echo "id=$(echo "$GITHUB_REF_NAME" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9-]/-/g' | cut -c1-30)" >> "$GITHUB_OUTPUT"
-      - uses: FirebaseExtended/action-hosting-deploy@v0
+          NEXT_PUBLIC_FIREBASE_API_KEY: ${{ vars.NEXT_PUBLIC_FIREBASE_API_KEY }}
+          NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: puugpersonalwebru.web.app
+          NEXT_PUBLIC_FIREBASE_PROJECT_ID: puugpersonalwebru
+          NEXT_PUBLIC_STRIPE_PUBLIC_KEY: ${{ vars.NEXT_PUBLIC_STRIPE_PUBLIC_KEY }}
+      - uses: google-github-actions/auth@v3
         with:
-          repoToken: '${{ secrets.GITHUB_TOKEN }}'
-          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_PUUGPERSONALWEBRU }}'
-          channelId: '${{ steps.channel.outputs.id }}'
-          projectId: puugpersonalwebru
-        env:
-          FIREBASE_CLI_PREVIEWS: hostingchannels
+          workload_identity_provider: ${{ vars.WIF_PROVIDER }}
+          service_account: ${{ vars.WIF_SERVICE_ACCOUNT }}
+      # Firebase channel IDs only allow letters, numbers and hyphens
+      - run: |
+          channel=$(echo "$GITHUB_REF_NAME" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9-]/-/g' | cut -c1-30)
+          npx --yes firebase-tools@15 hosting:channel:deploy "$channel" --expires 7d \
+            --project puugpersonalwebru --non-interactive --json > deploy.json
+          url=$(jq -r '.result | to_entries[0].value.url' deploy.json)
+          echo "Preview: $url" | tee -a "$GITHUB_STEP_SUMMARY"

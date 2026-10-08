@@ -47,13 +47,13 @@ const Component = (props) => {
       if (confirmation.error) setError(`${t('errors.paymentFailed')} ${confirmation.error.message}. ${t('resolvers.safeToRetryPayment')}`);
       else {
         try {
-          onSuccess({...(await httpsCallable(fns,'createBooking')({...booking,
-            userId: getUser().uid,
-            paymentReference: confirmation.paymentIntent.id,
-            date: booking.date.toMillis()})).data,
+          onSuccess({...(await httpsCallable(fns,'createBooking')({
+            paymentReference: confirmation.paymentIntent.id})).data,
             date: booking.date})
         } catch(err) {
-          setError(`${t('errors.general')} ${t('resolvers.callToConfirm')}`)
+          setError(err.details?.refunded
+            ? `${t('errors.slotTaken')} ${t('resolvers.refunded')}`
+            : `${t('errors.general')} ${t('resolvers.callToConfirm')}`)
         }
       }
     } finally {
