@@ -81,7 +81,6 @@ exports.stripePaymentIntent = region.https.onCall(async (data,context) => {
     customer: user.data().stripeRef,
     amount: amount,
     currency: "eur",
-    payment_method_types: ["card"],
     // What was paid for travels with the payment, so createBooking needn't trust the browser.
     metadata: { sessionType: data.sessionType, date: String(date.getTime()) },
   })
