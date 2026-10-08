@@ -1,0 +1,100 @@
+name: Deploy to production
+# Run by hand from the Actions tab. Each run is recorded against the
+# `production` environment, so its history lists which commit is live.
+#
+# deploy            builds `ref` and deploys the selected targets in a safe order:
+#                   functions, then Firestore rules, then hosting.
+#                   To roll everything back, run it with an earlier deployment's commit.
+# rollback-hosting  re-releases the previous live hosting version without rebuilding;
+#                   the fastest way back from a bad site release.
+'on':
+  workflow_dispatch:
+    inputs:
+      action:
+        type: choice
+        options: [deploy, rollback-hosting]
+        default: deploy
+      ref:
+        description: Commit, tag or branch to deploy
+        default: main
+      functions:
+        description: Deploy Cloud Functions
+        type: boolean
+        default: true
+      rules:
+        description: Deploy Firestore rules
+        type: boolean
+        default: true
+      hosting:
+        description: Deploy the site
+        type: boolean
+        default: true
+concurrency:
+  group: production
+  cancel-in-progress: false
+permissions:
+  contents: read
+  id-token: write
+env:
+  PROJECT_ID: puugpersonalwebru
+  FIREBASE: npx --yes firebase-tools@15
+jobs:
+  deploy:
+    if: inputs.action == 'deploy'
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.ref }}
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+      # Build before deploying anything, so a broken build changes nothing.
+      - if: inputs.hosting
+        run: npm ci && npm run build
+        env:
+          NEXT_PUBLIC_FIREBASE_API_KEY: ${{ vars.NEXT_PUBLIC_FIREBASE_API_KEY }}
+          NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: puugpersonalwebru.web.app
+          NEXT_PUBLIC_FIREBASE_PROJECT_ID: puugpersonalwebru
+          NEXT_PUBLIC_STRIPE_PUBLIC_KEY: ${{ vars.NEXT_PUBLIC_STRIPE_PUBLIC_KEY }}
+      - uses: google-github-actions/auth@v3
+        with:
+          workload_identity_provider: ${{ vars.WIF_PROVIDER }}
+          service_account: ${{ vars.WIF_SERVICE_ACCOUNT }}
+      - if: inputs.functions
+        run: |
+          npm ci --prefix functions
+          $FIREBASE deploy --only functions --project $PROJECT_ID --non-interactive
+      - if: inputs.rules
+        run: $FIREBASE deploy --only firestore:rules --project $PROJECT_ID --non-interactive
+      - if: inputs.hosting
+        run: $FIREBASE deploy --only hosting --project $PROJECT_ID --non-interactive --message "${{ github.sha }} via run ${{ github.run_id }}"
+
+  rollback-hosting:
+    if: inputs.action == 'rollback-hosting'
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - id: auth
+        uses: google-github-actions/auth@v3
+        with:
+          workload_identity_provider: ${{ vars.WIF_PROVIDER }}
+          service_account: ${{ vars.WIF_SERVICE_ACCOUNT }}
+          token_format: access_token
+      # Same as "Rollback" in the Firebase console: release the newest earlier
+      # version that differs from what's live now.
+      - env:
+          TOKEN: ${{ steps.auth.outputs.access_token }}
+        run: |
+          api=https://firebasehosting.googleapis.com/v1beta1/sites/$PROJECT_ID/channels/live/releases
+          releases=$(curl -sf -H "Authorization: Bearer $TOKEN" "$api?pageSize=20")
+          current=$(jq -r '.releases[0].version.name' <<<"$releases")
+          previous=$(jq -r --arg cur "$current" \
+            '[.releases[] | select(.version.name != $cur and .version.status == "FINALIZED")][0].version.name // empty' <<<"$releases")
+          [ -n "$previous" ] || { echo "::error::no earlier version to roll back to"; exit 1; }
+          echo "rolling back from $current to $previous"
+          curl -sf -X POST -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
+            -d '{"message":"rollback via run ${{ github.run_id }}"}' "$api?versionName=$previous" >/dev/null
+          echo "Rolled back hosting to \`$previous\`" >> "$GITHUB_STEP_SUMMARY"

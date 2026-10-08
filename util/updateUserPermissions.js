@@ -1,10 +1,9 @@
-require('dotenv').config()
 const inquirer = require('inquirer')
 const admin = require('firebase-admin')
 const { getAuth } = require('firebase-admin/auth')
 const { applicationDefault } = require('firebase-admin/app')
 
-availablePermissions = [
+const availablePermissions = [
   'CAN_VIEW_ALL_BOOKINGS',
   'CAN_EDIT_BOOKING_DETAILS'
 ]
@@ -52,7 +51,7 @@ async function main() {
 }
 
 main()
-  .then(() => process.exit(1))
+  .then(() => process.exit(0))
   .catch(err => {
     console.error(err)
     process.exit(1)

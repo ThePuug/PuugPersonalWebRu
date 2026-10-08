@@ -1,12 +1,14 @@
 {
   "errors": {
     "general": "Something went wrong.",
-    "paymentFailed": "Payment failed because"
+    "paymentFailed": "Payment failed because",
+    "slotTaken": "This time has just been booked by someone else."
   },
   "resolvers": {
     "reload": "Please reload the page and try again.",
     "callToConfirm": "Please call us to confirm your booking.",
-    "safeToRetryPayment": "You can safely try again and will only be charged once."
+    "safeToRetryPayment": "You can safely try again and will only be charged once.",
+    "refunded": "Your payment has been refunded in full; it may take a few days to reach your account."
   },
   "buttons": {
     "pay": "Pay"

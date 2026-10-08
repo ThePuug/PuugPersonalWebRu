@@ -104,11 +104,13 @@ const Page = () => {
       if(isSigningIn) setIsSigningIn(false)
       setLoading(true)
       try {
-        const response = await httpsCallable(fns, 'stripePaymentIntent')({sessionType:sessionType})
+        const response = await httpsCallable(fns, 'stripePaymentIntent')({sessionType:sessionType, date:timeslot.toMillis()})
         setPaymentIntent(response.data)
         setIsPaying(true)
       } catch(err) {
-        setError(`${t('errors.general')} ${t('resolvers.refreshRetry')} ${t('resolvers.thenContactToBook')}`)
+        setError(err.code === 'functions/already-exists'
+          ? `${t('errors.slotTaken')} ${t('resolvers.pickAnother')}`
+          : `${t('errors.general')} ${t('resolvers.refreshRetry')} ${t('resolvers.thenContactToBook')}`)
       } finally {
         setLoading(false)
       }
@@ -121,27 +123,43 @@ const Page = () => {
   }
 
   useEffect(() => {
+    let cancelled = false
     setLoadingEvents(true)
     const first = DateTime.local().startOf('month').plus(Duration.fromObject({months:monthIndex}))
     const start = first.minus(Duration.fromObject({days:first.weekday%7}))
-    getDocs(query(collection(db, "bookings"),
-        where('date', '>=', start.toJSDate()),
-        where('date', '<', start.plus(Duration.fromObject({days:43})).toJSDate())))
-      .then(snapshot => {
-        clearBookings()
-        snapshot.forEach(b => {
-          const data = b.data()
-          addBooking({
-            id: b.id,
-            duration: data.duration,
-            paymentReference: data.paymentReference,
-            date: DateTime.fromJSDate(data.date.toDate()).toLocal(),
-            userEmail: data.userEmail,
-            userId: data.userId,
-            sessionType: data.sessionType,
-          })})})
-      .finally(() => setLoadingEvents(false))
-  },[addBooking,clearBookings,monthIndex])
+    const inMonth = [
+      where('date', '>=', start.toJSDate()),
+      where('date', '<', start.plus(Duration.fromObject({days:43})).toJSDate())]
+    // Slots are public and carry only times; booking details are readable
+    // only for the user's own bookings, or all of them with CAN_VIEW_ALL_BOOKINGS.
+    const load = async () => {
+      const taken = await getDocs(query(collection(db, "slots"), ...inMonth))
+      const user = auth.currentUser
+      const details = new Map()
+      if(user) {
+        const { claims } = await user.getIdTokenResult()
+        const mine = await getDocs(claims.CAN_VIEW_ALL_BOOKINGS
+          ? query(collection(db, "bookings"), ...inMonth)
+          : query(collection(db, "bookings"), where('userId', '==', user.uid)))
+        mine.forEach(b => details.set(b.id, b.data()))
+      }
+      if(cancelled) return
+      clearBookings()
+      taken.forEach(s => {
+        const data = { ...s.data(), ...details.get(s.id) }
+        addBooking({
+          id: s.id,
+          duration: data.duration,
+          paymentReference: data.paymentReference,
+          date: DateTime.fromJSDate(data.date.toDate()).toLocal(),
+          userEmail: data.userEmail,
+          userId: data.userId,
+          sessionType: data.sessionType,
+        })})
+    }
+    load().finally(() => { if(!cancelled) setLoadingEvents(false) })
+    return () => { cancelled = true }
+  },[addBooking,clearBookings,monthIndex,isSignedIn])
   useEffect(() => {
     const unregisterAuthObserver = onAuthStateChanged(auth, user => {
       setIsSignedIn(!!user)

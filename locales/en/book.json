@@ -1,10 +1,12 @@
 {
   "errors": {
-    "general": "Something went wrong."
+    "general": "Something went wrong.",
+    "slotTaken": "This time has just been booked by someone else."
   },
   "resolvers": {
     "refreshRetry": "Please refresh the page and try again.",
-    "thenContactToBook": "If you're still unable to book your appointment, please contact us by phone or email!"
+    "thenContactToBook": "If you're still unable to book your appointment, please contact us by phone or email!",
+    "pickAnother": "Please choose another time."
   },
   "labels": {
     "consultationType": "Who is the booking for?",
