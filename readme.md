@@ -32,11 +32,12 @@ The purpose of this demo app was to showcase a custom developed scheduling and p
 - set staff permissions with `npm run permissions --prefix util`
 
 # Deploying
-Production deploys are run by hand: Actions -> **Deploy to production** -> Run workflow.
-- `deploy` builds the chosen ref and deploys the ticked targets in order: functions, Firestore rules, hosting
-- to roll everything back, run `deploy` again with the commit of an earlier successful run (listed under the `production` environment)
+Everything deploys through the `deploy` workflow:
+- a push to `main` (a merged PR) builds the site and puts it live; functions and Firestore rules are not deployed by a push
+- a push to any other branch deploys to a Firebase preview channel named after the branch; the URL is in the run summary
+- to deploy functions or rules, run it by hand: Actions -> **deploy** -> Run workflow. `deploy` builds the chosen ref and deploys the ticked targets in order: functions, Firestore rules, hosting
+- to roll everything back, run `deploy` by hand with the commit of an earlier successful run (listed under the `production` environment)
 - `rollback-hosting` re-releases the previous live site version without rebuilding; the quickest way back from a bad site release
-- pushes to non-main branches deploy to a Firebase preview channel named after the branch; the URL is in the run summary
 
 GitHub Actions authenticates to Google with Workload Identity Federation, so there is no service account key. It uses these repository variables (Settings -> Secrets and variables -> Actions -> Variables):
 - `WIF_PROVIDER`, `WIF_SERVICE_ACCOUNT`: the workload identity provider and the deploy service account
