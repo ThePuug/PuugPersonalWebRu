@@ -252,7 +252,7 @@ const Page = () => {
                     })}
                   </Stack>
                 </FormControl>
-                <Typography variant="h5" color="secondary">{sessionType === "individual" ? 60 : sessionType === 'couple' ? 80 : 40} €</Typography>
+                <Typography variant="h5" color="secondary">{sessionType === "individual" ? 80 : sessionType === 'couple' ? 110 : 60} €</Typography>
               </Stack>
             </Stack>
           </fieldset>

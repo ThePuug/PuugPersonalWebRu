@@ -79,7 +79,7 @@ const Component = (props) => {
                 {!!error && <span>{error}</span>}
               </FormHelperText>
             </FormControl>
-            <Typography variant="subtitle">{t('labels.amount')} {booking.sessionType === "individual" ? 60 : booking.sessionType === 'couple' ? 80 : 40} €</Typography>
+            <Typography variant="subtitle">{t('labels.amount')} {booking.sessionType === "individual" ? 80 : booking.sessionType === 'couple' ? 110 : 60} €</Typography>
           </Stack>
         </fieldset>
         <fieldset>

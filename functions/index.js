@@ -17,9 +17,9 @@ const HttpsError = functions.https.HttpsError
 
 // Stripe dropped BGN after Bulgaria's euro changeover; amounts are EUR cents.
 const SESSION_TYPES = {
-  individual: { amount: 6000, duration: 60 },
-  couple: { amount: 8000, duration: 90 },
-  child: { amount: 4000, duration: 60 },
+  individual: { amount: 8000, duration: 60 },
+  couple: { amount: 11000, duration: 90 },
+  child: { amount: 6000, duration: 60 },
 }
 const MAX_DURATION = Math.max(...Object.values(SESSION_TYPES).map(s => s.duration))
 
