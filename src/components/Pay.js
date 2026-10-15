@@ -6,6 +6,7 @@ import { CardElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import { httpsCallable } from "firebase/functions"
 import { useTranslation, Trans } from "react-i18next";
 import { getUser, fns } from "@/lib/firebase";
+import { PRICES } from "@/lib/prices";
 import Loads from "./Loads"
 
 const CARD_OPTIONS = {
@@ -79,7 +80,7 @@ const Component = (props) => {
                 {!!error && <span>{error}</span>}
               </FormHelperText>
             </FormControl>
-            <Typography variant="subtitle">{t('labels.amount')} {booking.sessionType === "individual" ? 80 : booking.sessionType === 'couple' ? 110 : 60} €</Typography>
+            <Typography variant="subtitle">{t('labels.amount')} {PRICES[booking.sessionType]} €</Typography>
           </Stack>
         </fieldset>
         <fieldset>

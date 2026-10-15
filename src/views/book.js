@@ -16,6 +16,7 @@ import { onAuthStateChanged } from "firebase/auth"
 import { collection, query, where, getDocs } from "firebase/firestore"
 import { httpsCallable } from "firebase/functions"
 import { isBrowser, isLoggedIn, getUser, auth, db, fns } from "@/lib/firebase"
+import { PRICES } from "@/lib/prices"
 import SignIn from "@/components/SignIn"
 import Nav from "@/components/Nav"
 import Footer from "@/components/Footer"
@@ -252,7 +253,7 @@ const Page = () => {
                     })}
                   </Stack>
                 </FormControl>
-                <Typography variant="h5" color="secondary">{sessionType === "individual" ? 80 : sessionType === 'couple' ? 110 : 60} €</Typography>
+                <Typography variant="h5" color="secondary">{PRICES[sessionType]} €</Typography>
               </Stack>
             </Stack>
           </fieldset>

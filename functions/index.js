@@ -16,6 +16,7 @@ const region = functions.region("europe-central2").runWith({ secrets: [STRIPE_SE
 const HttpsError = functions.https.HttpsError
 
 // Stripe dropped BGN after Bulgaria's euro changeover; amounts are EUR cents.
+// The site shows these prices from src/lib/prices.js; change both together.
 const SESSION_TYPES = {
   individual: { amount: 8000, duration: 60 },
   couple: { amount: 11000, duration: 90 },

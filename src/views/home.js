@@ -7,6 +7,7 @@ import { Attachment, Facebook, LinkedIn } from "@mui/icons-material"
 import { useTranslation } from "react-i18next"
 import Nav from "@/components/Nav"
 import Footer from "@/components/Footer"
+import { PRICES } from "@/lib/prices"
 
 // brand crayon-stroke colors used as small accents (the design "ink" is periwinkle).
 // Service-card chips deliberately avoid teal/blue/orange/red — those are reserved for
@@ -73,7 +74,8 @@ const Page = (props) => {
         <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(3, 1fr)' }, gap: { xs: 2.5, md: 3 } }}>
           {services.map((s, i) => (
             <ServiceCard key={s.for} sx={reveal(i * 90)}>
-              <Box sx={{ p: 1, pb: 0 }}>
+              <Box sx={{ p: 1, pb: 0, position: 'relative' }}>
+                <PriceTag>{PRICES[s.for]} €</PriceTag>
                 <Box component="img" src={`/images/${s.img}`} alt={s.title}
                   sx={{ width: '100%', display: 'block', aspectRatio: '2 / 1', objectFit: 'cover',
                     borderRadius: '10px', border: '1px solid rgba(91,75,196,0.22)' }} />
@@ -211,6 +213,36 @@ const HeroName = styled(Typography)(({ theme }) => ({
     borderRadius: 6,
     transformOrigin: 'left',
     animation: 'underdraw .7s .5s ease-out both',
+  },
+}))
+
+// a small paper tag pinned to the painting's corner, with a punched hole
+const PriceTag = styled('span')(({ theme }) => ({
+  position: 'absolute',
+  top: 16,
+  right: 16,
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: 6,
+  padding: '2px 10px 2px 8px',
+  borderRadius: '4px 999px 999px 4px',
+  background: '#FBF7F0',
+  border: '1px solid rgba(91,75,196,0.35)',
+  boxShadow: '0 4px 10px -6px rgba(91,75,196,0.6)',
+  color: theme.palette.primary.main,
+  fontFamily: theme.typography.h5.fontFamily,
+  fontSize: '0.95rem',
+  fontWeight: 600,
+  // Playfair's default old-style figures make 110 read like "llo"
+  fontVariantNumeric: 'lining-nums',
+  lineHeight: 1.5,
+  transform: 'rotate(-3deg)',
+  '&::before': {
+    content: '""',
+    width: 5,
+    height: 5,
+    borderRadius: '50%',
+    border: '1px solid rgba(91,75,196,0.5)',
   },
 }))
 
